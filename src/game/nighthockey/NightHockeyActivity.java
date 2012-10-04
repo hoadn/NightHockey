@@ -1,6 +1,7 @@
 package game.nighthockey;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
@@ -19,7 +20,11 @@ import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
+
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
@@ -38,6 +43,9 @@ public class NightHockeyActivity extends SimpleBaseGameActivity {
 	private TiledTextureRegion playerFace;
 	private TextureRegion puckFace;
 	private BitmapTextureAtlas textureAtlas;
+	
+	/* HockeyPlayers */
+	ArrayList<HockeyPlayer> hockeyPlayers = new ArrayList<HockeyPlayer>();	
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -58,11 +66,34 @@ public class NightHockeyActivity extends SimpleBaseGameActivity {
 	
 	@Override
 	public Scene onCreateScene() {
-		scene = new Scene();
-		scene.setBackground(new Background(1, 1, 1));
+		/* check every 0.5 sec that is bodies moving or not */
+		Timer timer = new Timer(0.5f, new Timer.TimerCalculator() {
+		    public void onTick() {
+				Iterator<Body> bodies = physics.getBodies();
+				HockeyPlayer.listenTouch = true;
 
+				while(bodies.hasNext()) {
+					Body body = bodies.next();
+					Vector2 bodyVelocity = body.getLinearVelocity();
+					float velocitySquared = (float)bodyVelocity.len2();
+					
+					if(velocitySquared >= 0.1) {
+						HockeyPlayer.listenTouch = false;
+						break;
+					}
+				}
+		    }
+		});
+		mEngine.registerUpdateHandler(timer);
+	
+		/* Init scene and physics */
 		physics = new FixedStepPhysicsWorld(25 ,new Vector2(0, 0), false, 8, 3);
+		scene = new Scene();
+		scene.registerUpdateHandler(physics);
+		scene.setBackground(new Background(1, 1, 1));
+		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
+		/* Crate game borders */
 		final VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 		final Rectangle ground = new Rectangle(0, CAMERA_HEIGHT - 2, CAMERA_WIDTH, 2, vbo);
 		final Rectangle roof = new Rectangle(0, 0, CAMERA_WIDTH, 2, vbo);
@@ -80,19 +111,15 @@ public class NightHockeyActivity extends SimpleBaseGameActivity {
 		scene.attachChild(left);
 		scene.attachChild(right);
 		
-		scene.registerUpdateHandler(physics);
-		scene.setTouchAreaBindingOnActionDownEnabled(true);
-		
 		resetHockeyPlayers();
 
 		return scene;
 	}
-	
+
 	private void resetHockeyPlayers() {
 		TiledTextureRegion texture = this.playerFace;
 		VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
-		
-		ArrayList<HockeyPlayer> hockeyPlayers = new ArrayList<HockeyPlayer>();	
+	
 		/* Set first team */
 		hockeyPlayers.add(new HockeyPlayer(100, 150, texture, vbo, physics, HOME));
 		hockeyPlayers.add(new HockeyPlayer(100, 250, texture, vbo, physics, HOME));

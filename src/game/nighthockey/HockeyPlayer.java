@@ -34,12 +34,6 @@ class HockeyPlayer extends AnimatedSprite {
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
 		this.animate(300);
 	}
-	
-	public boolean isMoving() {
-		if(body.getLinearVelocity() != new Vector2(0, 0))
-			return true;
-		return false;
-	}
 
 	@Override
 	public boolean onAreaTouched(TouchEvent pSceneTouchEvent,float pTouchAreaLocalX, float pTouchAreaLocalY) {
