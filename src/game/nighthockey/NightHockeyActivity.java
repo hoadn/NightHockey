@@ -19,7 +19,6 @@ import org.andengine.entity.scene.ITouchArea;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
@@ -48,15 +47,10 @@ import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.debug.Debug;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.KeyEvent;
-import android.widget.EditText;
+
 import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
@@ -103,6 +97,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 		puckFace = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "face_puck.png", 32, 64);
 		textureAtlas.load();
 	}
+
 	
 	@Override
 	public Scene onCreateScene() {
@@ -196,7 +191,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 	}
 	
 	
-	
 	/*************************************************************************************/
 	
 	
@@ -206,7 +200,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 
 	private static final String LOCALHOST_IP = "127.0.0.1";
 
-	private static final int SERVER_PORT = 4444;
+	private static final int SERVER_PORT = 4746;
 
 	private static final short FLAG_MESSAGE_SERVER_ADD_FACE = 1;
 	private static final short FLAG_MESSAGE_SERVER_MOVE_FACE = FLAG_MESSAGE_SERVER_ADD_FACE + 1;
@@ -238,6 +232,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 
 
 	public Scene onCreateScene2(Scene scene) {
+		initServerAndClient();
+		
 		Log.i("NETWORK", "onScene2");
 		/* We allow only the server to actively send around messages. */
 		if(mSocketServer != null) {
@@ -247,7 +243,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 					if(pSceneTouchEvent.isActionDown()) {
 						try {
 							final AddFaceServerMessage addFaceServerMessage = (AddFaceServerMessage) mMessagePool.obtainMessage(FLAG_MESSAGE_SERVER_ADD_FACE);
-							addFaceServerMessage.set(mFaceIDCounter++, pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
+							addFaceServerMessage.set(3, 32, 3232);
 
 							mSocketServer.sendBroadcastServerMessage(addFaceServerMessage);
 
@@ -266,11 +262,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 				@Override
 				public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final ITouchArea pTouchArea, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 					try {
-						final Sprite face = (Sprite)pTouchArea;
-						final Integer faceID = (Integer)face.getUserData();
-
 						final MoveFaceServerMessage moveFaceServerMessage = (MoveFaceServerMessage) mMessagePool.obtainMessage(FLAG_MESSAGE_SERVER_MOVE_FACE);
-						moveFaceServerMessage.set(faceID, pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
+						moveFaceServerMessage.set(3333, 3223, 3223);
 
 						mSocketServer.sendBroadcastServerMessage(moveFaceServerMessage);
 
@@ -282,93 +275,10 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 					return true;
 				}
 			});
-
 			scene.setTouchAreaBindingOnActionDownEnabled(true);
 		}
-		
-		initServerAndClient();
 
 		return scene;
-	}
-
-	@Override
-	protected Dialog onCreateDialog(final int pID) {
-		switch(pID) {
-			case DIALOG_SHOW_SERVER_IP_ID:
-				try {
-					return new AlertDialog.Builder(this)
-					.setIcon(android.R.drawable.ic_dialog_info)
-					.setTitle("Your Server-IP ...")
-					.setCancelable(false)
-					.setMessage("The IP of your Server is:\n" + WifiUtils.getWifiIPv4Address(this))
-					.setPositiveButton(android.R.string.ok, null)
-					.create();
-				} catch (final UnknownHostException e) {
-					return new AlertDialog.Builder(this)
-					.setIcon(android.R.drawable.ic_dialog_alert)
-					.setTitle("Your Server-IP ...")
-					.setCancelable(false)
-					.setMessage("Error retrieving IP of your Server: " + e)
-					.setPositiveButton(android.R.string.ok, new OnClickListener() {
-						@Override
-						public void onClick(final DialogInterface pDialog, final int pWhich) {
-							finish();
-						}
-					})
-					.create();
-				}
-			case DIALOG_ENTER_SERVER_IP_ID:
-				final EditText ipEditText = new EditText(this);
-				return new AlertDialog.Builder(this)
-				.setIcon(android.R.drawable.ic_dialog_info)
-				.setTitle("Enter Server-IP ...")
-				.setCancelable(false)
-				.setView(ipEditText)
-				.setPositiveButton("Connect", new OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface pDialog, final int pWhich) {
-						mServerIP = ipEditText.getText().toString();
-						initClient();
-					}
-				})
-				.setNegativeButton(android.R.string.cancel, new OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface pDialog, final int pWhich) {
-						finish();
-					}
-				})
-				.create();
-			case DIALOG_CHOOSE_SERVER_OR_CLIENT_ID:
-				return new AlertDialog.Builder(this)
-				.setIcon(android.R.drawable.ic_dialog_info)
-				.setTitle("Be Server or Client ...")
-				.setCancelable(false)
-				.setPositiveButton("Client", new OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface pDialog, final int pWhich) {
-						showDialog(DIALOG_ENTER_SERVER_IP_ID);
-					}
-				})
-				.setNeutralButton("Server", new OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface pDialog, final int pWhich) {
-						toast("You can add and move sprites, which are only shown on the clients.");
-						initServer();
-						showDialog(DIALOG_SHOW_SERVER_IP_ID);
-					}
-				})
-				.setNegativeButton("Both", new OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface pDialog, final int pWhich) {
-						toast("You can add sprites and move them, by dragging them.");
-						initServerAndClient();
-						showDialog(DIALOG_SHOW_SERVER_IP_ID);
-					}
-				})
-				.create();
-			default:
-				return super.onCreateDialog(pID);
-		}
 	}
 
 	@Override
@@ -404,20 +314,12 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 	// ===========================================================
 
 	public void addFace(final int pID, final float pX, final float pY) {
-		final Scene scene = this.mEngine.getScene();
-		/* Create the face and add it to the scene. */
-		final Sprite face = new Sprite(0, 0, this.mFaceTextureRegion, this.getVertexBufferObjectManager());
-		face.setPosition(pX - face.getWidth() * 0.5f, pY - face.getHeight() * 0.5f);
-		face.setUserData(pID);
-		this.mFaces.put(pID, face);
-		scene.registerTouchArea(face);
-		scene.attachChild(face);
+		Log.i("NETWORK", "addFace");
 	}
 
 	public void moveFace(final int pID, final float pX, final float pY) {
 		/* Find and move the face. */
-		final Sprite face = this.mFaces.get(pID);
-		face.setPosition(pX - face.getWidth() * 0.5f, pY - face.getHeight() * 0.5f);
+		Log.i("NETWORK", "moveFace");
 	}
 
 	private void initServerAndClient() {
