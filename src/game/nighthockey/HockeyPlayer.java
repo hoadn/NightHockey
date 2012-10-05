@@ -11,15 +11,19 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 class HockeyPlayer extends AnimatedSprite  {
-	private final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
+	public static short ID = 0;
+	
 	protected final Body body;
-	private boolean team;
 	protected boolean isActive = false; /* if current body is set to move */
 	protected boolean isHockeyplayer = true;
+	private final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
+	private short playerID;
+
 	
 	public HockeyPlayer(final float pX, final float pY, final TiledTextureRegion pTextureRegion, 
-						final VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld, boolean team) {
+						final VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld) {
 		super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
+		playerID = ID++;
 		
 		body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, FIXTURE_DEF);
 		body.setLinearDamping(0.8f);
@@ -29,5 +33,9 @@ class HockeyPlayer extends AnimatedSprite  {
 		
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
 		this.animate(300);
+	}
+	
+	public short getID() {
+		return playerID;
 	}
 }

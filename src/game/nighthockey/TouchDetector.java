@@ -1,15 +1,12 @@
 package game.nighthockey;
 
 import java.util.Iterator;
-
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.input.touch.TouchEvent;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -25,7 +22,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
-		if(pSceneTouchEvent.getAction() == MotionEvent.ACTION_DOWN) {
+		if(pSceneTouchEvent.getAction() == MotionEvent.ACTION_DOWN) {			
 			if(listenTouch) {
 				Iterator<Body> bodies = physics.getBodies();
 				downPosition = new Vector2(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
@@ -52,9 +49,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 			}
 		} else if(pSceneTouchEvent.getAction() == MotionEvent.ACTION_UP) {
 			Vector2 upPosition = new Vector2(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
-			
 			Iterator<Body> bodies = physics.getBodies();
-			Vector2 touchPosition = new Vector2(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 			
 			while(bodies.hasNext()) {
 				Body body = bodies.next();
@@ -71,6 +66,8 @@ public class TouchDetector implements IOnSceneTouchListener {
 					Log.i("Distance", "Speed " + speed.x + " " + speed.y);
 					
 					player.body.setLinearVelocity(speed);
+					NetworkHandler handler = NetworkHandler.getInstance();
+					handler.sendActionMessage(player.getID(), speed);
 					
 					listenTouch = false;
 					player.isActive = false;
