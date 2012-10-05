@@ -3,4 +3,11 @@
 *.properties
 *.apk
 bin/
-
+assets/
+gen/
+libs/
+res/
+.classpath
+.project
+*.png
+proguard-project
