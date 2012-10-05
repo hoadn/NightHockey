@@ -2,7 +2,6 @@ package game.nighthockey;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
@@ -20,7 +19,6 @@ import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
-import android.util.Log;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -89,7 +87,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		scene.registerUpdateHandler(physics);
 		scene.setBackground(new Background(1, 1, 1));
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
-		Log.i("TOUCH", "Test");
 		
 		scene.setOnSceneTouchListener(new TouchDetector(physics));
 
@@ -112,8 +109,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		scene.attachChild(right);
 		
 		resetHockeyPlayers();
-		
-		//onCreateScene2(scene);
 		
 		return scene;
 	}
