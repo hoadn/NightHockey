@@ -11,3 +11,4 @@ res/
 .project
 *.png
 proguard-project
+.settings/
