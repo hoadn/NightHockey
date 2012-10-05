@@ -1,25 +1,12 @@
 package game.nighthockey;
 
-<<<<<<< HEAD
 import android.os.Bundle;
 import android.app.Activity;
+import android.view.GestureDetector.OnGestureListener;
+import android.view.GestureDetector;
 import android.view.Menu;
+import android.view.MotionEvent;
 
-public class NightHockeyActivity extends Activity {
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_night_hockey);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_night_hockey, menu);
-        return true;
-    }
-}
-=======
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -56,6 +43,7 @@ import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.input.touch.detector.SurfaceGestureDetector;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
@@ -76,12 +64,14 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
-public class NightHockeyActivity extends SimpleBaseGameActivity implements ClientMessageFlags, ServerMessageFlags  {
+public class NightHockeyActivity extends SimpleBaseGameActivity implements ClientMessageFlags, ServerMessageFlags, OnGestureListener  {
 	/* Const varibles */
 	private static final int CAMERA_WIDTH = 800;
 	private static final int CAMERA_HEIGHT = 480;
 	private final boolean HOME = true;
 	private final boolean VISITOR = false;
+	
+	private GestureDetector gestureScanner;
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
@@ -97,6 +87,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 	
 	public NightHockeyActivity() {
 		this.initMessagePool();
+		gestureScanner = new GestureDetector(this);
 	}
 	
 	@Override
@@ -166,7 +157,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 		
 		resetHockeyPlayers();
 		
-		onCreateScene2(scene);
+		//onCreateScene2(scene);
 		
 		return scene;
 	}
@@ -555,5 +546,42 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 			Log.i("NETWORK", "onTerminated");
 		}
 	}
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		Log.i("TOUCH", "FLING");
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
->>>>>>> 6895bf4543c5564d63f8bfe75ef9f81ea3c77b8d
