@@ -18,7 +18,6 @@ class Puck extends Sprite {
 	public Puck(final float pX, final float pY, final TextureRegion pTextureRegion, 
 						final VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld) {
 		super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
-		this.setSize(60, 60);
 		
 		body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, FIXTURE_DEF);
 		

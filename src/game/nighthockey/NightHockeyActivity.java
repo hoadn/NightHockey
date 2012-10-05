@@ -61,7 +61,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity {
 		scene = new Scene();
 		scene.setBackground(new Background(1, 1, 1));
 
-		physics = new FixedStepPhysicsWorld(25 ,new Vector2(0, 0), false, 8, 3);
+		physics = new FixedStepPhysicsWorld(25 ,new Vector2(0, 0), false, 8, 1);
 
 		final VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 		final Rectangle ground = new Rectangle(0, CAMERA_HEIGHT - 2, CAMERA_WIDTH, 2, vbo);
