@@ -9,30 +9,23 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
-import android.view.MotionEvent;
 
 class HockeyPlayer extends AnimatedSprite  {
-	public static boolean listenTouch = true;
-
 	private final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-	private final Body body;
+	protected final Body body;
 	private boolean team;
-	float startX, startY,newX,newY;
-	float startTime;
-
+	protected boolean isActive = false; /* if current body is set to move */
+	protected boolean isHockeyplayer = true;
 	
 	public HockeyPlayer(final float pX, final float pY, final TiledTextureRegion pTextureRegion, 
 						final VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld, boolean team) {
 		super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
 		
-
-		
 		body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, FIXTURE_DEF);
-		body.setLinearDamping(0.2f);
-		body.setAngularDamping(0.2f);
+		body.setLinearDamping(0.8f);
+		body.setAngularDamping(0.8f);
+		
+		body.setUserData(this);
 		
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
 		this.animate(300);

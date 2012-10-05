@@ -1,19 +1,11 @@
 package game.nighthockey;
 
-import android.os.Bundle;
-import android.app.Activity;
-import android.view.GestureDetector.OnGestureListener;
-import android.view.GestureDetector;
-import android.view.Menu;
-import android.view.MotionEvent;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
@@ -24,7 +16,6 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.ITouchArea;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
-import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
@@ -43,35 +34,28 @@ import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.input.touch.detector.SurfaceGestureDetector;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.debug.Debug;
-
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.widget.Toast;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
-public class NightHockeyActivity extends SimpleBaseGameActivity implements ClientMessageFlags, ServerMessageFlags, OnGestureListener  {
+public class NightHockeyActivity extends SimpleBaseGameActivity implements ClientMessageFlags, ServerMessageFlags {
 	/* Const varibles */
 	private static final int CAMERA_WIDTH = 800;
 	private static final int CAMERA_HEIGHT = 480;
 	private final boolean HOME = true;
 	private final boolean VISITOR = false;
-	
-	private GestureDetector gestureScanner;
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
@@ -87,7 +71,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 	
 	public NightHockeyActivity() {
 		this.initMessagePool();
-		gestureScanner = new GestureDetector(this);
 	}
 	
 	@Override
@@ -114,7 +97,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 		Timer timer = new Timer(0.5f, new Timer.TimerCalculator() {
 		    public void onTick() {
 				Iterator<Body> bodies = physics.getBodies();
-				HockeyPlayer.listenTouch = true;
+				TouchDetector.listenTouch = true;
 				
 				while(bodies.hasNext()) {
 					Body body = bodies.next();
@@ -122,7 +105,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 					float velocitySquared = (float)bodyVelocity.len2();
 					
 					if(velocitySquared >= 0.1) {
-						HockeyPlayer.listenTouch = false;
+						TouchDetector.listenTouch = false;
 						break;
 					}
 				}
@@ -136,6 +119,9 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 		scene.registerUpdateHandler(physics);
 		scene.setBackground(new Background(1, 1, 1));
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
+		Log.i("TOUCH", "Test");
+		
+		scene.setOnSceneTouchListener(new TouchDetector(physics));
 
 		/* Crate game borders */
 		final VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
@@ -167,7 +153,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 		VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 	
 		/* Set first team */
-		hockeyPlayers.add(new HockeyPlayer(100, 150, texture, vbo, physics, HOME));
+		hockeyPlayers.add(new HockeyPlayer(100, 100, texture, vbo, physics, HOME));
 		hockeyPlayers.add(new HockeyPlayer(100, 250, texture, vbo, physics, HOME));
 		hockeyPlayers.add(new HockeyPlayer(200, 100, texture, vbo, physics, HOME));
 		hockeyPlayers.add(new HockeyPlayer(200, 200, texture, vbo, physics, HOME));
@@ -213,19 +199,9 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 	private static final short FLAG_MESSAGE_SERVER_ADD_FACE = 1;
 	private static final short FLAG_MESSAGE_SERVER_MOVE_FACE = FLAG_MESSAGE_SERVER_ADD_FACE + 1;
 
-	private static final int DIALOG_CHOOSE_SERVER_OR_CLIENT_ID = 0;
-	private static final int DIALOG_ENTER_SERVER_IP_ID = DIALOG_CHOOSE_SERVER_OR_CLIENT_ID + 1;
-	private static final int DIALOG_SHOW_SERVER_IP_ID = DIALOG_ENTER_SERVER_IP_ID + 1;
-
 	// ===========================================================
 	// Fields
-	// ===========================================================
-
-	private BitmapTextureAtlas mBitmapTextureAtlas;
-	private ITextureRegion mFaceTextureRegion;
-
-	private int mFaceIDCounter;
-	private final SparseArray<Sprite> mFaces = new SparseArray<Sprite>();
+	// ==========================================================
 
 	private String mServerIP = LOCALHOST_IP;
 	private SocketServer<SocketConnectionClientConnector> mSocketServer;
@@ -237,7 +213,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 		this.mMessagePool.registerMessage(FLAG_MESSAGE_SERVER_ADD_FACE, AddFaceServerMessage.class);
 		this.mMessagePool.registerMessage(FLAG_MESSAGE_SERVER_MOVE_FACE, MoveFaceServerMessage.class);
 	}
-
 
 	public Scene onCreateScene2(Scene scene) {
 		initServerAndClient();
@@ -545,43 +520,5 @@ public class NightHockeyActivity extends SimpleBaseGameActivity implements Clien
 			toast("SERVER: Client disconnected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
 			Log.i("NETWORK", "onTerminated");
 		}
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		Log.i("TOUCH", "FLING");
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 class Puck extends Sprite {
 	final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	final Body body;
+	protected boolean isHockeyplayer = false;
 	
 	public Puck(final float pX, final float pY, final TextureRegion pTextureRegion, 
 						final VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld) {
