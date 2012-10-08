@@ -34,7 +34,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	private PhysicsWorld physics;
 	
 	/* Texture handles */
-	private TiledTextureRegion playerFace;
+	private TextureRegion homeTexture;
+	private TextureRegion visitorTexture;
 	private TextureRegion puckFace;
 	private BitmapTextureAtlas textureAtlas;
 	
@@ -53,8 +54,9 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 		
 		textureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 256, 256, TextureOptions.BILINEAR);
-		playerFace = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.textureAtlas, this, "face_circle_tiled.png", 0, 32, 2, 1);
-		puckFace = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "face_puck.png", 32, 64);
+		homeTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "home.png", 0, 64);
+		visitorTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "visitor.png", 64, 128);
+		puckFace = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "puck.png", 128, 160);
 		textureAtlas.load();
 	}
 
@@ -114,21 +116,20 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	}
 
 	private void resetHockeyPlayers() {
-		TiledTextureRegion texture = this.playerFace;
 		VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 	
 		/* Set first team */
-		hockeyPlayers.add(new HockeyPlayer(100, 100, texture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(100, 250, texture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(200, 100, texture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(200, 200, texture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(200, 300, texture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(100, 100, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(100, 250, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(200, 100, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(200, 200, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(200, 300, homeTexture, vbo, physics));
 		/* Set second team */
-		hockeyPlayers.add(new HockeyPlayer(500, 150, texture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(500, 250, texture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(400, 100, texture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(400, 200, texture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(400, 300, texture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(500, 150, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(500, 250, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(400, 100, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(400, 200, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer(400, 300, visitorTexture, vbo, physics));
 
 		Puck puck = new Puck(CAMERA_WIDTH/2, CAMERA_HEIGHT/2, puckFace, vbo, physics);
 		

@@ -1,16 +1,17 @@
 package game.nighthockey;
 
-import org.andengine.entity.sprite.AnimatedSprite;
+import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
-class HockeyPlayer extends AnimatedSprite  {
+class HockeyPlayer extends Sprite  {
 	public static short ID = 0;
 	
 	protected final Body body;
@@ -20,7 +21,7 @@ class HockeyPlayer extends AnimatedSprite  {
 	private short playerID;
 
 	
-	public HockeyPlayer(final float pX, final float pY, final TiledTextureRegion pTextureRegion, 
+	public HockeyPlayer(final float pX, final float pY, final TextureRegion pTextureRegion, 
 						final VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld) {
 		super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
 		playerID = ID++;
@@ -32,7 +33,6 @@ class HockeyPlayer extends AnimatedSprite  {
 		body.setUserData(this);
 		
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
-		this.animate(300);
 	}
 	
 	public short getID() {
