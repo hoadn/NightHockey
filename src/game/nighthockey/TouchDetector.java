@@ -57,7 +57,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 				if(player == null) continue;
 				
 				if(player.isActive) {
-					double deltaTime = (System.currentTimeMillis() - startTime) / 1000;
+					double deltaTime = (System.currentTimeMillis() - startTime) / 100;
 					Log.i("Distance", "deltaTime f" + deltaTime);
 					
 					Vector2 distance = new Vector2(upPosition.x - downPosition.x, upPosition.y - downPosition.y);
