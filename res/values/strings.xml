@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="app_name">NightHockey</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_night_hockey">NightHockeyActivity</string>
+    <string name="mainmenuText">NIGHT HOCKEY</string>
+    <string name="singleplayer">Singleplayer</string>
+    <string name="multiplayer">Multipalyer</string>
+    <string name="title_activity_multiplayer">Multiplayer</string>
+
+</resources>

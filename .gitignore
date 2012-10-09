@@ -5,7 +5,6 @@
 bin/
 gen/
 libs/
-res/
 .classpath
 .project
 *project.txt

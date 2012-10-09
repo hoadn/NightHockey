@@ -31,7 +31,8 @@ public class Mainmenu extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				
+				Intent intent = new Intent(getBaseContext(), Multiplayer.class);
+				startActivity(intent);
 			}
 		});
     }
