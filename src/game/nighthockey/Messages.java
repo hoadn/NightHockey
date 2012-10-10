@@ -8,14 +8,22 @@ import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMes
 
 import android.util.Log;
 
-public class Messages {
+public class Messages implements ClientMessageFlags, ServerMessageFlags {
 	public static final short MESSAGE_ID_SYNC = 1;
 	public static final short MESSAGE_ID_MOVE = MESSAGE_ID_SYNC + 1;
+	
+	public Messages() {
+		
+	}
 	
 	public static class Synchrate extends ServerMessage {
 		public short mID;
 		public float mX;
 		public float mY;
+		
+		public Synchrate() {
+			
+		}
 
 		public Synchrate(final short pID, final float pX, final float pY) {
 			mID = pID;
@@ -56,6 +64,10 @@ public class Messages {
 		public short ID;
 		public float mX;
 		public float mY;
+		
+		public Move() {
+			
+		}
 
 		public Move(final short pID, final float pX, final float pY) {
 			ID = pID;

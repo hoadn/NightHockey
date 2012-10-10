@@ -1,10 +1,13 @@
 package game.nighthockey;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
+import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
 import org.andengine.extension.multiplayer.protocol.client.IServerMessageHandler;
 import org.andengine.extension.multiplayer.protocol.client.connector.ServerConnector;
 import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector;
@@ -16,17 +19,14 @@ import org.andengine.extension.multiplayer.protocol.server.connector.SocketConne
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector.ISocketConnectionClientConnectorListener;
 import org.andengine.extension.multiplayer.protocol.shared.SocketConnection;
 import org.andengine.extension.multiplayer.protocol.util.MessagePool;
-import org.andengine.util.debug.Debug;
-
 import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 
 public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 	private static NetworkHandler networkHandler;
-	private static final String LOCALHOST_IP = "127.0.0.1";
-	private static final int SERVER_PORT = 4746;
-	private String mServerIP = LOCALHOST_IP;
+	private String ipAddress = "127.0.0.1";
+	private int SERVER_PORT = 4746;
 	private SocketServer<SocketConnectionClientConnector> mSocketServer;
 	private ServerConnector<SocketConnection> mServerConnector;
 	private final MessagePool<IMessage> mMessagePool = new MessagePool<IMessage>();
@@ -39,29 +39,41 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 		return networkHandler;
 	}
 	
-	public NetworkHandler() {
-		initMessagePool();		
-		initServerAndClient();
+	public void startServer() {
+		initMessagePool();
+		Log.e("NETWORK ERROR", "test message");
+		
+		Log.i("NETWORK", "startServer");
+		initServer();
+	}
+	
+	public void connectClient(String add) {
+		ipAddress = add;
+		initMessagePool();
+		
+		Log.i("NETWORK", "startClient");
+		initClient();
 	}
 	
 	public void sendActionMessage(short ID, Vector2 velocity) {
 		try {
-			final Messages.Synchrate moveFaceServerMessage = (Messages.Synchrate) mMessagePool.obtainMessage(Messages.MESSAGE_ID_SYNC);
+			Move moveFaceServerMessage = (Move) mMessagePool.obtainMessage(MESSAGE_ID_MOVE);
 			moveFaceServerMessage.set(ID, velocity.x, velocity.y);
 
-			mSocketServer.sendBroadcastServerMessage(moveFaceServerMessage);
+			if(mSocketServer != null)
+				mSocketServer.sendBroadcastServerMessage(moveFaceServerMessage);
+			else
+				Log.e("NETWORK ERROR", "mSocketServer is null");
 
 			mMessagePool.recycleMessage(moveFaceServerMessage);
 		} catch (final IOException e) {
 			Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
 		}
 	}
-	
 
-
-	private void initMessagePool() {
-		mMessagePool.registerMessage(Messages.MESSAGE_ID_SYNC, Messages.Synchrate.class);
-		mMessagePool.registerMessage(Messages.MESSAGE_ID_MOVE, Messages.Move.class);
+	private void initMessagePool() {		
+		mMessagePool.registerMessage(MESSAGE_ID_SYNC, Synchrate.class);
+		mMessagePool.registerMessage(MESSAGE_ID_MOVE, Move.class);
 	}
 
 	@Override
@@ -70,7 +82,7 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 			try {
 				mSocketServer.sendBroadcastServerMessage(new ConnectionCloseServerMessage());
 			} catch (final IOException e) {
-				Debug.e(e);
+				Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
 			}
 			mSocketServer.terminate();
 		}
@@ -89,20 +101,6 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 		Log.i("NETWORK", "moveFace");
 	}
 
-	private void initServerAndClient() {
-		Log.i("NETWORK", "initClientAndServer");
-		this.initServer();
-
-		/* Wait some time after the server has been started, so it actually can start up. */
-		try {
-			Thread.sleep(500);
-		} catch (final Throwable t) {
-			Debug.e(t);
-		}
-
-		this.initClient();
-	}
-
 	private void initServer() {
 		Log.i("NETWORK", "initServer");
 		mSocketServer = new SocketServer<SocketConnectionClientConnector>(SERVER_PORT, new ClientConnectorListener(), new ServerStateListener()) {
@@ -119,7 +117,7 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 	private void initClient() {
 		Log.i("NETWORK", "initClient");
 		try {
-			mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(this.mServerIP, SERVER_PORT)), new ServerConnectorListener());
+			mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(ipAddress, SERVER_PORT)), new ServerConnectorListener());
 
 			mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_CONNECTION_CLOSE, ConnectionCloseServerMessage.class, new IServerMessageHandler<SocketConnection>() {
 				@Override
@@ -128,20 +126,20 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 				}
 			});
 
-			mServerConnector.registerServerMessage(Messages.MESSAGE_ID_SYNC, Messages.Synchrate.class, new IServerMessageHandler<SocketConnection>() {
+			mServerConnector.registerServerMessage(MESSAGE_ID_SYNC, Synchrate.class, new IServerMessageHandler<SocketConnection>() {
 				@Override
 				public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
 					Log.i("NETWORK", "onHandleMessage: add face");
-					final Messages.Synchrate addFaceServerMessage = (Messages.Synchrate)pServerMessage;
+					final Synchrate addFaceServerMessage = (Synchrate)pServerMessage;
 					addFace(addFaceServerMessage.mID, addFaceServerMessage.mX, addFaceServerMessage.mY);
 				}
 			});
 
-			mServerConnector.registerServerMessage(Messages.MESSAGE_ID_MOVE, Messages.Move.class, new IServerMessageHandler<SocketConnection>() {
+			mServerConnector.registerServerMessage(MESSAGE_ID_MOVE, Move.class, new IServerMessageHandler<SocketConnection>() {
 				@Override
 				public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
 					Log.i("NETWORK", "onHandleMessage");
-					final Messages.Move moveFaceServerMessage = (Messages.Move)pServerMessage;
+					final Move moveFaceServerMessage = (Move)pServerMessage;
 					moveFace(moveFaceServerMessage.ID, moveFaceServerMessage.mX, moveFaceServerMessage.mY);
 				}
 			});
@@ -192,6 +190,98 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 		@Override
 		public void onTerminated(final ClientConnector<SocketConnection> pConnector) {
 			Log.i("NETWORK", "Client onTerminated");
+		}
+	}
+	
+	/**************************************************************************************/
+	public static final short MESSAGE_ID_SYNC = 1;
+	public static final short MESSAGE_ID_MOVE = 2;
+	
+	public static class Synchrate extends ServerMessage {
+		public short mID;
+		public float mX;
+		public float mY;
+		
+		public Synchrate() {
+			
+		}
+
+		public Synchrate(final short pID, final float pX, final float pY) {
+			mID = pID;
+			mX = pX;
+			mY = pY;
+		}
+
+		public void set(final short pID, final float pX, final float pY) {
+			mID = pID;
+			mX = pX;
+			mY = pY;
+		}
+
+		@Override
+		public short getFlag() {
+			return MESSAGE_ID_SYNC;
+		}
+
+		@Override
+		protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
+			mID = pDataInputStream.readShort();
+			mX = pDataInputStream.readFloat();
+			mY = pDataInputStream.readFloat();
+			
+			Log.i("NETWORK", "SERVER onReadTransmissionData " + mID + " " + mX + " " + " " + mY);
+		}
+
+		@Override
+		protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
+			Log.i("NETWORK", "onWriteTransmissionData");
+			pDataOutputStream.writeShort(mID);
+			pDataOutputStream.writeFloat(mX);
+			pDataOutputStream.writeFloat(mY);
+		}
+	}
+
+	public static class Move extends ServerMessage {
+		public short ID;
+		public float mX;
+		public float mY;
+		
+		public Move() {
+			
+		}
+
+		public Move(final short pID, final float pX, final float pY) {
+			ID = pID;
+			mX = pX;
+			mY = pY;
+		}
+
+		public void set(final short pID, final float pX, final float pY) {
+			ID = pID;
+			mX = pX;
+			mY = pY;
+		}
+
+		@Override
+		public short getFlag() {
+			return MESSAGE_ID_MOVE;
+		}
+
+		@Override
+		protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
+			ID = pDataInputStream.readShort();
+			mX = pDataInputStream.readFloat();
+			mY = pDataInputStream.readFloat();
+			
+			Log.i("NETWORK", "CLIENT onReadTransmissionData:" + ID + " " + mX + " " + mY);
+		}
+
+		@Override
+		protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
+			Log.i("NETWORK", "onWriteTransmissionData");
+			pDataOutputStream.writeShort(ID);
+			pDataOutputStream.writeFloat(this.mX);
+			pDataOutputStream.writeFloat(this.mY);
 		}
 	}
 }

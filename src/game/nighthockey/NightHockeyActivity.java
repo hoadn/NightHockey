@@ -2,6 +2,7 @@ package game.nighthockey;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
@@ -16,9 +17,9 @@ import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.TextureRegion;
-import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -58,6 +59,10 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		visitorTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "visitor.png", 64, 128);
 		puckFace = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "puck.png", 128, 160);
 		textureAtlas.load();
+		
+		NetworkHandler nh = new NetworkHandler();
+		nh.connectClient("200.62.151.246");
+		nh.startServer();
 	}
 
 	
