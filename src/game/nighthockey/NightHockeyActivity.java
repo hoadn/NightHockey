@@ -60,12 +60,11 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		puckFace = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "puck.png", 128, 160);
 		textureAtlas.load();
 		
-		NetworkHandler nh = new NetworkHandler();
+		NetworkHandler nh = NetworkHandler.getInstance();
 		nh.connectClient("200.62.151.246");
-		nh.startServer();
+		//nh.startServer();
 	}
 
-	
 	@Override
 	public Scene onCreateScene() {
 		/* check every 0.5 sec that is bodies moving or not */
