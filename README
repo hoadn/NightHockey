@@ -1,0 +1,14 @@
+NightHockey game
+
+Android game using AndEngine. In game there is multiplayer and singleplayer modes.
+Multiplayer works over wifi and other phone is server other is client.
+Game is turn based where player swipes players and tryies to put puck into enemys goal.
+
+TODO:
+- Goals
+- Points
+- Timer calculator for turns and game
+- Ice
+- Network client -> server
+- Messages between client/server
+- Main menu
