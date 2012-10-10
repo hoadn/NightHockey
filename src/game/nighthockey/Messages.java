@@ -3,8 +3,13 @@ package game.nighthockey;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
+import org.andengine.extension.physics.box2d.PhysicsWorld;
+
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 import android.util.Log;
 
@@ -13,7 +18,6 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 	public static final short MESSAGE_ID_MOVE = MESSAGE_ID_SYNC + 1;
 	
 	public Messages() {
-		
 	}
 	
 	public static class Synchrate extends ServerMessage {
@@ -21,8 +25,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		public float mX;
 		public float mY;
 		
-		public Synchrate() {
-			
+		public Synchrate() {		
 		}
 
 		public Synchrate(final short pID, final float pX, final float pY) {
@@ -32,6 +35,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		}
 
 		public void set(final short pID, final float pX, final float pY) {
+			Log.i("NETWORK", "set message");
 			mID = pID;
 			mX = pX;
 			mY = pY;
@@ -66,7 +70,6 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		public float mY;
 		
 		public Move() {
-			
 		}
 
 		public Move(final short pID, final float pX, final float pY) {
@@ -76,6 +79,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		}
 
 		public void set(final short pID, final float pX, final float pY) {
+			Log.i("NETWORK", "set message");
 			ID = pID;
 			mX = pX;
 			mY = pY;
@@ -93,6 +97,19 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			mY = pDataInputStream.readFloat();
 			
 			Log.i("NETWORK", "CLIENT onReadTransmissionData:" + ID + " " + mX + " " + mY);
+			
+			PhysicsWorld physics = NightHockeyActivity.getPhysics();
+			Iterator<Body> bodies = physics.getBodies();
+			TouchDetector.listenTouch = true;
+			
+			while(bodies.hasNext()) {
+				Body body = bodies.next();
+				HockeyPlayer player = (HockeyPlayer) body.getUserData();
+				if(player == null) continue;
+				
+				if(player.getID() == ID)
+					player.body.setLinearVelocity(new Vector2(mX,mY));
+			}
 		}
 
 		@Override

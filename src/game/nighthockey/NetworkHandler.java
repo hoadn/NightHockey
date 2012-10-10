@@ -56,14 +56,12 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 	}
 	
 	public void sendActionMessage(short ID, Vector2 velocity) {
+		Log.i("NETWORK", "Send message");
 		try {
 			Messages.Move moveFaceServerMessage = (Messages.Move) mMessagePool.obtainMessage(Messages.MESSAGE_ID_MOVE);
 			moveFaceServerMessage.set(ID, velocity.x, velocity.y);
 
-			if(mSocketServer != null)
-				mSocketServer.sendBroadcastServerMessage(moveFaceServerMessage);
-			else
-				Log.e("NETWORK ERROR", "mSocketServer is null");
+			mSocketServer.sendBroadcastServerMessage(moveFaceServerMessage);
 
 			mMessagePool.recycleMessage(moveFaceServerMessage);
 		} catch (final IOException e) {

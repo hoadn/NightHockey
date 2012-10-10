@@ -32,7 +32,11 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
-	private PhysicsWorld physics;
+	private static PhysicsWorld physics;
+	
+	public static PhysicsWorld getPhysics() {
+		return physics;
+	}
 	
 	/* Texture handles */
 	private TextureRegion homeTexture;
@@ -61,8 +65,9 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		textureAtlas.load();
 		
 		NetworkHandler nh = NetworkHandler.getInstance();
-		nh.connectClient("200.62.151.246");
 		//nh.startServer();
+		
+		nh.connectClient("192.168.100.50");	
 	}
 
 	@Override
