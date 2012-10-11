@@ -28,9 +28,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class NightHockeyActivity extends SimpleBaseGameActivity  {
-	/* Const varibles */
+	/* Environment */
 	public static int screenWidth = 800;
 	public static int screenHeight = 480;
+	
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
@@ -40,6 +41,10 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		return physics;
 	}
 	
+	/* Game states and timers to it */
+	public static boolean ONLINE_GAME = false;
+	Timer startTimer;
+	
 	/* Texture handles */
 	private TextureRegion homeTexture;
 	private TextureRegion visitorTexture;
@@ -47,8 +52,10 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	private TextureRegion spotLightTexture;
 	private BitmapTextureAtlas textureAtlas;
 	
-	/* HockeyPlayers */
+	/* Game objects */
 	ArrayList<HockeyPlayer> hockeyPlayers = new ArrayList<HockeyPlayer>();	
+	ArrayList<SpotLight> spotLights = new ArrayList<SpotLight>();
+	Puck puck;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -75,7 +82,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	@Override
 	public Scene onCreateScene() {		
 		/* check every 0.5 sec that is bodies moving or not */
-		Timer timer = new Timer(0.5f, new Timer.TimerCalculator() {
+		Timer moveCheckTimer = new Timer(0.5f, new Timer.TimerCalculator() {
 		    public void onTick() {
 				Iterator<Body> bodies = physics.getBodies();
 				TouchDetector.listenTouch = true;
@@ -92,16 +99,36 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 				}
 		    }
 		});
-		mEngine.registerUpdateHandler(timer);
+		/* Show lighting first 5 sec then start the game officially */
+		startTimer = new Timer(5f, new Timer.TimerCalculator() {
+		    public void onTick() {
+		    	scene.setBackground(new Background(1f, 1f, 1f));
+		    	
+		    	/* remove ligths and then set alpha correctly */
+		    	for(SpotLight light : spotLights)
+		    		scene.detachChild(light);
+		    	
+		    	for(HockeyPlayer player : hockeyPlayers) {
+		    		player.setAlpha(1.0f);
+		    	}
+		    	
+		    	puck.setAlpha(1.0f);
+		    	
+				scene.setOnSceneTouchListener(new TouchDetector(physics,ONLINE_GAME));
+				/* stop this timer */
+				mEngine.unregisterUpdateHandler(startTimer);
+		    }
+		});
+		
+		mEngine.registerUpdateHandler(moveCheckTimer);
+		mEngine.registerUpdateHandler(startTimer);
 	
 		/* Init scene and physics */
 		physics = new FixedStepPhysicsWorld(25 ,new Vector2(0, 0), false, 8, 3);
 		scene = new Scene();
 		scene.registerUpdateHandler(physics);
-		scene.setBackground(new Background(0f, 0f, 0f));
+		scene.setBackground(new Background(0.1f, 0.1f, 0.1f));
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
-		
-		scene.setOnSceneTouchListener(new TouchDetector(physics));
 
 		/* Crate game borders */
 		final VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
@@ -130,28 +157,31 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 	
 		/* Set first team */
-		hockeyPlayers.add(new HockeyPlayer(100, 100, homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(100, 250, homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(200, 100, homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(200, 200, homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(200, 300, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 200, (screenHeight/2) - 50 , homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 200, (screenHeight/2) + 50 , homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 100, (screenHeight/2) - 100, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 100, (screenHeight/2) - 000, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 100, (screenHeight/2) + 100, homeTexture, vbo, physics));
 		/* Set second team */
-		hockeyPlayers.add(new HockeyPlayer(500, 150, visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(500, 250, visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(400, 100, visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(400, 200, visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer(400, 300, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 200, (screenHeight/2) - 50 , visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 200, (screenHeight/2) + 50 , visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 100, (screenHeight/2) - 100, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 100, (screenHeight/2) - 000, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 100, (screenHeight/2) + 100, visitorTexture, vbo, physics));
 
-		Puck puck = new Puck(screenWidth/2, screenHeight/2, puckTexture, vbo, physics);
-		SpotLight light = new SpotLight(100, 100, spotLightTexture, vbo);
+		puck = new Puck(screenWidth/2, screenHeight/2, puckTexture, vbo, physics);
+		for(int i = 0; i <= 5; i++) {
+			spotLights.add(new SpotLight(400, 300, spotLightTexture, vbo));
+		}
 		
 		for(HockeyPlayer player : hockeyPlayers) {
-			scene.registerTouchArea(player);
 			scene.attachChild(player);
+		}
+		for(SpotLight light : spotLights) {
+			scene.attachChild(light);
 		}
 
 		scene.attachChild(puck);
-		scene.attachChild(light);
 	}
 
 	@Override

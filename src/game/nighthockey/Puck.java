@@ -25,6 +25,8 @@ class Puck extends Sprite {
 		body.setLinearDamping(0.3f);
 		body.setAngularDamping(0.3f);
 		
+		setAlpha(0.2f);
+		
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
 	}
 }
