@@ -20,6 +20,8 @@ import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 
+import android.view.Display;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -27,8 +29,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	/* Const varibles */
-	private static final int CAMERA_WIDTH = 800;
-	private static final int CAMERA_HEIGHT = 480;
+	public static int screenWidth = 800;
+	public static int screenHeight = 480;
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
@@ -41,7 +43,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	/* Texture handles */
 	private TextureRegion homeTexture;
 	private TextureRegion visitorTexture;
-	private TextureRegion puckFace;
+	private TextureRegion puckTexture;
+	private TextureRegion spotLightTexture;
 	private BitmapTextureAtlas textureAtlas;
 	
 	/* HockeyPlayers */
@@ -49,9 +52,12 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
-		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+	    final Display display = getWindowManager().getDefaultDisplay();
+	    screenWidth = display.getWidth();
+	    screenHeight = display.getHeight();
+		final Camera camera = new Camera(0, 0, screenWidth, screenHeight);
 
-		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(screenWidth, screenHeight), camera);
 	}
 
 	@Override
@@ -59,19 +65,15 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 		
 		textureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 256, 256, TextureOptions.BILINEAR);
-		homeTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "home.png", 0, 64);
-		visitorTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "visitor.png", 64, 128);
-		puckFace = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.textureAtlas, this, "puck.png", 128, 160);
+		homeTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "home.png", 0, 0);
+		visitorTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "visitor.png", 64, 0);
+		puckTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "puck.png", 128, 0);
+		spotLightTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "spotlight.png", 0, 64);
 		textureAtlas.load();
-		
-		NetworkHandler nh = NetworkHandler.getInstance();
-		//nh.startServer();
-		
-		nh.connectClient("192.168.100.50");	
 	}
 
 	@Override
-	public Scene onCreateScene() {
+	public Scene onCreateScene() {		
 		/* check every 0.5 sec that is bodies moving or not */
 		Timer timer = new Timer(0.5f, new Timer.TimerCalculator() {
 		    public void onTick() {
@@ -96,17 +98,17 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		physics = new FixedStepPhysicsWorld(25 ,new Vector2(0, 0), false, 8, 3);
 		scene = new Scene();
 		scene.registerUpdateHandler(physics);
-		scene.setBackground(new Background(1, 1, 1));
+		scene.setBackground(new Background(0f, 0f, 0f));
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
 		
 		scene.setOnSceneTouchListener(new TouchDetector(physics));
 
 		/* Crate game borders */
 		final VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
-		final Rectangle ground = new Rectangle(0, CAMERA_HEIGHT - 2, CAMERA_WIDTH, 2, vbo);
-		final Rectangle roof = new Rectangle(0, 0, CAMERA_WIDTH, 2, vbo);
-		final Rectangle left = new Rectangle(0, 0, 2, CAMERA_HEIGHT, vbo);
-		final Rectangle right = new Rectangle(CAMERA_WIDTH - 2, 0, 2, CAMERA_HEIGHT, vbo);
+		final Rectangle ground = new Rectangle(0, screenHeight - 2, screenWidth, 2, vbo);
+		final Rectangle roof = new Rectangle(0, 0, screenWidth, 2, vbo);
+		final Rectangle left = new Rectangle(0, 0, 2, screenHeight, vbo);
+		final Rectangle right = new Rectangle(screenWidth - 2, 0, 2, screenHeight, vbo);
 
 		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0, 0.5f, 0.5f);
 		PhysicsFactory.createBoxBody(physics, ground, BodyType.StaticBody, wallFixtureDef);
@@ -140,7 +142,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		hockeyPlayers.add(new HockeyPlayer(400, 200, visitorTexture, vbo, physics));
 		hockeyPlayers.add(new HockeyPlayer(400, 300, visitorTexture, vbo, physics));
 
-		Puck puck = new Puck(CAMERA_WIDTH/2, CAMERA_HEIGHT/2, puckFace, vbo, physics);
+		Puck puck = new Puck(screenWidth/2, screenHeight/2, puckTexture, vbo, physics);
+		SpotLight light = new SpotLight(100, 100, spotLightTexture, vbo);
 		
 		for(HockeyPlayer player : hockeyPlayers) {
 			scene.registerTouchArea(player);
@@ -148,6 +151,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		}
 
 		scene.attachChild(puck);
+		scene.attachChild(light);
 	}
 
 	@Override

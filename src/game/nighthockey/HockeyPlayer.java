@@ -29,6 +29,8 @@ class HockeyPlayer extends Sprite  {
 		body.setLinearDamping(0.8f);
 		body.setAngularDamping(0.8f);
 		
+		setAlpha(0.2f);
+		
 		body.setUserData(this);
 		
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
