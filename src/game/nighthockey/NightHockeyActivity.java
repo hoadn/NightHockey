@@ -148,12 +148,12 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		scene.attachChild(left);
 		scene.attachChild(right);
 		
-		resetHockeyPlayers();
+		createHockeyPlayers();
 		
 		return scene;
 	}
 
-	private void resetHockeyPlayers() {
+	private void createHockeyPlayers() {
 		VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 	
 		/* Set first team */

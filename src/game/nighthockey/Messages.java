@@ -20,11 +20,29 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 	public Messages() {
 	}
 	
+	public static class ConnectionCloseServer extends ServerMessage {
+		public ConnectionCloseServer() {
+		}
+
+		@Override
+		public short getFlag() {
+			return FLAG_MESSAGE_SERVER_CONNECTION_CLOSE;
+		}
+
+		@Override
+		protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
+		}
+
+		@Override
+		protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
+		}
+	}
+	
 	public static class Synchrate extends ServerMessage {
 		public short mID;
 		public float mX;
 		public float mY;
-		
+
 		public Synchrate() {		
 		}
 
