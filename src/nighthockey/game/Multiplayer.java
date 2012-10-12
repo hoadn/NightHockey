@@ -5,6 +5,7 @@ import game.nighthockey.R;
 import java.net.InetAddress;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,6 +30,9 @@ public class Multiplayer extends Activity {
 		@Override
 		public void handleMessage(Message msg){
 			Toast.makeText(getBaseContext(), "connected", Toast.LENGTH_SHORT).show();
+			
+			Intent intent = new Intent(getBaseContext(), NightHockeyActivity.class);
+			startActivity(intent);
 		}
 	};
 	
@@ -56,6 +60,7 @@ public class Multiplayer extends Activity {
 				if (selectedButton.getText().equals("Server")){
 					net.startServer();		
 					waitClientConnection();
+					startGame.setEnabled(false);
 				}
 				else{
 					Toast.makeText(getBaseContext(), "Start client game. Address:" +connectIp.getText(), Toast.LENGTH_SHORT).show();

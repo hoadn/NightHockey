@@ -2,6 +2,7 @@ package nighthockey.game;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -120,14 +121,21 @@ public class NetworkHandler {
 	
 	private void initClient() {
 		Log.i("NETWORK", "initClient");
+		
 		try {
 			mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(ipAddress, SERVER_PORT)), new ServerConnectorListener());
-			
-			registerMessages();
-
+		} catch (UnknownHostException e) {
+			Log.i("NETWORK ERROR", "initClient() UnknownException");
+		} catch (IOException e) {
+			Log.i("NETWORK ERROR", "initClient() IOException ");
+		}
+		
+		registerMessages();
+		
+		try {
 			mServerConnector.getConnection().start();
 		} catch (final Throwable t) {
-			Log.i("NETWORK ERROR", "initClient()" + t.getMessage());
+			Log.i("NETWORK ERROR", "initClient() " + t.getMessage());
 		}
 	}
 	
@@ -160,7 +168,7 @@ public class NetworkHandler {
 	private class ServerConnectorListener implements ISocketConnectionServerConnectorListener {
 		@Override
 		public void onStarted(ServerConnector<SocketConnection> pServerConnector) {
-			Log.i("NETWORK", "Server onStarted");	
+			Log.i("NETWORK", "Server onStarted 2");	
 		}
 
 		@Override
@@ -172,7 +180,7 @@ public class NetworkHandler {
 	private class ServerStateListener implements ISocketServerListener<SocketConnectionClientConnector> {		
 		@Override
 		public void onStarted(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
-			Log.i("NETWORK", "Server onStarted");
+			Log.i("NETWORK", "Server onStarted 1");
 		}
 
 		@Override
@@ -191,7 +199,6 @@ public class NetworkHandler {
 		public void onStarted(final ClientConnector<SocketConnection> pConnector) {
 			Log.i("NETWORK", "Client connected");
 			isConnected = true;
-			
 		}
 
 		@Override
