@@ -165,7 +165,7 @@ public class NetworkHandler {
 	private class ServerConnectorListener implements ISocketConnectionServerConnectorListener {
 		@Override
 		public void onStarted(ServerConnector<SocketConnection> pServerConnector) {
-			Log.i("NETWORK", "Server onStarted");	
+			Log.i("NETWORK", "Server onStarted 2");	
 		}
 
 		@Override
@@ -177,7 +177,7 @@ public class NetworkHandler {
 	private class ServerStateListener implements ISocketServerListener<SocketConnectionClientConnector> {		
 		@Override
 		public void onStarted(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
-			Log.i("NETWORK", "Server onStarted");
+			Log.i("NETWORK", "Server onStarted 1");
 		}
 
 		@Override
