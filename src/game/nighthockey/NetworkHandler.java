@@ -21,7 +21,7 @@ import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
+public class NetworkHandler {
 	private static NetworkHandler networkHandler;
 	private String ipAddress = "127.0.0.1";
 	private int SERVER_PORT = 4746;
@@ -80,7 +80,7 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 			try {
 				mSocketServer.sendBroadcastServerMessage(new Messages.ConnectionCloseServer());
 			} catch (final IOException e) {
-				Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
+				Log.e("NETWORK ERROR", "EXEPTION: finalize()" + e.getMessage());
 			}
 			mSocketServer.terminate();
 		}
@@ -119,7 +119,7 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 		try {
 			mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(ipAddress, SERVER_PORT)), new ServerConnectorListener());
 
-			mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_CONNECTION_CLOSE, Messages.ConnectionCloseServer.class, new IServerMessageHandler<SocketConnection>() {
+			mServerConnector.registerServerMessage(Messages.FLAG_MESSAGE_SERVER_CONNECTION_CLOSE, Messages.ConnectionCloseServer.class, new IServerMessageHandler<SocketConnection>() {
 				@Override
 				public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
 					Log.i("NETWORK", "onHandleMessage: we lost connection to server");
@@ -146,7 +146,7 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 
 			mServerConnector.getConnection().start();
 		} catch (final Throwable t) {
-			Log.i("NETWORK ERROR", "" + t.getMessage());
+			Log.i("NETWORK ERROR", "initClient()" + t.getMessage());
 		}
 	}
 	

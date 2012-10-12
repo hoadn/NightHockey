@@ -20,6 +20,7 @@ import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 
+import android.util.Log;
 import android.view.Display;
 
 import com.badlogic.gdx.math.Vector2;
@@ -32,7 +33,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	public static int screenWidth = 800;
 	public static int screenHeight = 480;
 	
-	
 	/* Worlds(draw, physics) */
 	private Scene scene;
 	private static PhysicsWorld physics;
@@ -42,7 +42,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	}
 	
 	/* Game states and timers to it */
-	public static boolean ONLINE_GAME = false;
+	public static boolean ONLINE_GAME = true;
 	Timer startTimer;
 	
 	/* Texture handles */
@@ -62,8 +62,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	    final Display display = getWindowManager().getDefaultDisplay();
 	    screenWidth = display.getWidth();
 	    screenHeight = display.getHeight();
-		final Camera camera = new Camera(0, 0, screenWidth, screenHeight);
-
+		final Camera camera = new Camera(0, 0, screenWidth, screenHeight);	
+		
 		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(screenWidth, screenHeight), camera);
 	}
 
@@ -149,6 +149,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		scene.attachChild(right);
 		
 		createHockeyPlayers();
+		Log.i("NETWORK", "Test message");
 		
 		return scene;
 	}

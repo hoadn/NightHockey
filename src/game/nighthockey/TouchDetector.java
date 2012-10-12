@@ -65,6 +65,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 					Vector2 speed = new Vector2(distance.x / (float)deltaTime, distance.y / (float)deltaTime);
 					
 					player.body.setLinearVelocity(speed);
+					
 					if(online) {
 						NetworkHandler handler = NetworkHandler.getInstance();
 						handler.sendActionMessage(player.getID(), speed);
