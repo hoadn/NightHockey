@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.andengine.extension.multiplayer.protocol.adt.message.client.ClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 
@@ -16,6 +17,7 @@ import android.util.Log;
 public class Messages implements ClientMessageFlags, ServerMessageFlags {
 	public static final short MESSAGE_ID_SYNC = 1;
 	public static final short MESSAGE_ID_MOVE = MESSAGE_ID_SYNC + 1;
+	public static final short MESSAGE_ID_INIT = 3;
 	
 	public Messages() {
 	}
@@ -137,5 +139,33 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			pDataOutputStream.writeFloat(this.mX);
 			pDataOutputStream.writeFloat(this.mY);
 		}
+	}
+	
+	public static class Init extends ClientMessage{
+		public String name;
+		public Init(){
+			
+		}
+
+		@Override
+		public short getFlag() {
+			// TODO Auto-generated method stub
+			return MESSAGE_ID_INIT;
+		}
+
+		@Override
+		protected void onReadTransmissionData(DataInputStream pDataInputStream)
+				throws IOException {
+			// TODO Auto-generated method stub
+			name = pDataInputStream.readUTF();
+		}
+
+		@Override
+		protected void onWriteTransmissionData(
+				DataOutputStream pDataOutputStream) throws IOException {
+			// TODO Auto-generated method stub
+			pDataOutputStream.writeUTF(name);
+		}
+		
 	}
 }
