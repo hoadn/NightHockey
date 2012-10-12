@@ -4,7 +4,10 @@ import java.net.InetAddress;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +23,18 @@ public class Multiplayer extends Activity {
 	RadioButton selectedButton;
 	Button startGame;
 	EditText connectIp;
+	Handler handler = new Handler(){
+		@Override
+		public void handleMessage(Message msg){
+			NetworkHandler net = NetworkHandler.getInstance();
+			if(net.isConnected()){
+				Toast.makeText(getBaseContext(), "connected", Toast.LENGTH_SHORT).show();
+			Log.i("thread","thre1");}
+			else{
+				Toast.makeText(getBaseContext(), "waiting", Toast.LENGTH_SHORT).show();	
+			Log.i("thread","thre2");}
+		}
+	};
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,13 +60,23 @@ public class Multiplayer extends Activity {
 				selectedButton = (RadioButton)findViewById(radios.getCheckedRadioButtonId());
 				NetworkHandler net = NetworkHandler.getInstance();
 				if (selectedButton.getText().equals("Server")){
-					Toast.makeText(getBaseContext(), "Start server game", Toast.LENGTH_SHORT).show();
 					net.startServer();
-					SystemClock.sleep(3000);
-					if(net.isConnected())
-						Toast.makeText(getBaseContext(), "connected", Toast.LENGTH_SHORT).show();					
-					else
-						Toast.makeText(getBaseContext(), "waiting", Toast.LENGTH_SHORT).show();		
+					
+					Thread background=new Thread(new Runnable() {
+						   @Override
+						   public void run() {
+						     try {
+						    	Thread.sleep(1000);
+						    	Log.i("thread","thre");
+						    	handler.handleMessage(handler.obtainMessage());
+						     } catch (Exception e) {
+						    	
+						     }  
+						   }
+						  });
+
+						  background.start();
+						
 					
 				}
 				else{
