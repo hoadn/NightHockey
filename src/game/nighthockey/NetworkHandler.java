@@ -28,6 +28,7 @@ public class NetworkHandler {
 	private SocketServer<SocketConnectionClientConnector> mSocketServer;
 	private ServerConnector<SocketConnection> mServerConnector;
 	private final MessagePool<IMessage> mMessagePool = new MessagePool<IMessage>();
+	private boolean isConnected = false;
 	
 	public static NetworkHandler getInstance() {
 		if(networkHandler == null) {
@@ -55,6 +56,16 @@ public class NetworkHandler {
 		initClient();
 	}
 	
+	public void sendInitMessage(String name){
+		try{
+			Messages.Init init = (Messages.Init) mMessagePool.obtainMessage(Messages.MESSAGE_ID_INIT);
+			init.name = name;
+			mServerConnector.sendClientMessage(init);
+			mMessagePool.recycleMessage(init);
+		}catch (final IOException e){
+			Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
+		}
+	}
 	public void sendActionMessage(short ID, Vector2 velocity) {
 		Log.i("NETWORK", "Send message");
 		try {
@@ -72,6 +83,7 @@ public class NetworkHandler {
 	private void initMessagePool() {		
 		mMessagePool.registerMessage(Messages.MESSAGE_ID_SYNC, Messages.Synchrate.class);
 		mMessagePool.registerMessage(Messages.MESSAGE_ID_MOVE, Messages.Move.class);
+		mMessagePool.registerMessage(Messages.MESSAGE_ID_INIT, Messages.Init.class);
 	}
 
 	@Override
@@ -111,7 +123,7 @@ public class NetworkHandler {
 		mSocketServer.start();
 	}
 	public boolean isConnected(){
-		return mSocketServer.isRunning();
+		return isConnected;
 	}
 	
 	private void initClient() {
@@ -182,12 +194,15 @@ public class NetworkHandler {
 	private class ClientConnectorListener implements ISocketConnectionClientConnectorListener {
 		@Override
 		public void onStarted(final ClientConnector<SocketConnection> pConnector) {
-			Log.i("NETWORK", "Client onStarted");
+			Log.i("NETWORK", "Client connected");
+			isConnected = true;
+			
 		}
 
 		@Override
 		public void onTerminated(final ClientConnector<SocketConnection> pConnector) {
-			Log.i("NETWORK", "Client onTerminated");
+			Log.i("NETWORK", "Client Terminated");
+			isConnected = false;
 		}
 	}
 }

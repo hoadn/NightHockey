@@ -83,6 +83,7 @@ public class Multiplayer extends Activity {
 					Toast.makeText(getBaseContext(), "Start client game. Address:" +connectIp.getText(), Toast.LENGTH_SHORT).show();
 					String ip = connectIp.getText().toString();
 					net.connectClient(ip);
+					
 				}	
 			}
 		});
