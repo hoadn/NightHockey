@@ -18,6 +18,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 	public static final short MESSAGE_ID_SYNC = 1;
 	public static final short MESSAGE_ID_MOVE = 2;
 	public static final short MESSAGE_ID_INIT = 3;
+	public static final short MESSAGE_ID_MVCL = 4;
 	
 	public Messages() {
 	}
@@ -141,7 +142,64 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		}
 	}
 	
-	public static class Init extends ClientMessage{
+	public static class MoveClient extends ClientMessage {
+		public short ID;
+		public float mX;
+		public float mY;
+		
+		public MoveClient() {
+		}
+
+		public MoveClient(final short pID, final float pX, final float pY) {
+			ID = pID;
+			mX = pX;
+			mY = pY;
+		}
+
+		public void set(final short pID, final float pX, final float pY) {
+			Log.i("NETWORK", "set message");
+			ID = pID;
+			mX = pX;
+			mY = pY;
+		}
+
+		@Override
+		public short getFlag() {
+			return MESSAGE_ID_MVCL;
+		}
+
+		@Override
+		protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
+			ID = pDataInputStream.readShort();
+			mX = pDataInputStream.readFloat();
+			mY = pDataInputStream.readFloat();
+			
+			Log.i("NETWORK", "CLIENT onReadTransmissionData:" + ID + " " + mX + " " + mY);
+			
+			PhysicsWorld physics = NightHockeyActivity.getPhysics();
+			Iterator<Body> bodies = physics.getBodies();
+			TouchDetector.listenTouch = true;
+			
+			while(bodies.hasNext()) {
+				Body body = bodies.next();
+				HockeyPlayer player = (HockeyPlayer) body.getUserData();
+				if(player == null) continue;
+				
+				if(player.getID() == ID)
+					player.body.setLinearVelocity(new Vector2(mX,mY));
+			}
+		}
+
+		@Override
+		protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
+			Log.i("NETWORK", "onWriteTransmissionData");
+			pDataOutputStream.writeShort(ID);
+			pDataOutputStream.writeFloat(this.mX);
+			pDataOutputStream.writeFloat(this.mY);
+		}
+	}
+	
+	public static class Init extends ClientMessage {
 		public String name;
 		public Init(){
 			
