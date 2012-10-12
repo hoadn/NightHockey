@@ -42,24 +42,24 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 	}
 	
 	public static class Synchrate extends ServerMessage {
-		public short mID;
-		public float mX;
-		public float mY;
+		public short ID;
+		public float x;
+		public float y;
 
 		public Synchrate() {		
 		}
 
 		public Synchrate(final short pID, final float pX, final float pY) {
-			mID = pID;
-			mX = pX;
-			mY = pY;
+			this.ID = pID;
+			this.x = pX;
+			this.y = pY;
 		}
 
 		public void set(final short pID, final float pX, final float pY) {
 			Log.i("NETWORK", "set message");
-			mID = pID;
-			mX = pX;
-			mY = pY;
+			ID = pID;
+			x = pX;
+			y = pY;
 		}
 
 		@Override
@@ -69,19 +69,31 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 
 		@Override
 		protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
-			mID = pDataInputStream.readShort();
-			mX = pDataInputStream.readFloat();
-			mY = pDataInputStream.readFloat();
+			ID = pDataInputStream.readShort();
+			x = pDataInputStream.readFloat();
+			y = pDataInputStream.readFloat();
 			
-			Log.i("NETWORK", "SERVER onReadTransmissionData " + mID + " " + mX + " " + " " + mY);
+			Log.i("NETWORK", "SERVER onReadTransmissionData " + ID + " " + x + " " + " " + y);
+			PhysicsWorld physics = NightHockeyActivity.getPhysics();
+			Iterator<Body> bodies = physics.getBodies();
+			TouchDetector.listenTouch = true;
+			
+			while(bodies.hasNext()) {
+				Body body = bodies.next();
+				HockeyPlayer player = (HockeyPlayer) body.getUserData();
+				if(player == null) continue;
+				
+				if(player.getID() == ID)
+					player.body.setTransform(new Vector2(x,y), 0);
+			}
 		}
 
 		@Override
 		protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
 			Log.i("NETWORK", "onWriteTransmissionData");
-			pDataOutputStream.writeShort(mID);
-			pDataOutputStream.writeFloat(mX);
-			pDataOutputStream.writeFloat(mY);
+			pDataOutputStream.writeShort(ID);
+			pDataOutputStream.writeFloat(x);
+			pDataOutputStream.writeFloat(y);
 		}
 	}
 

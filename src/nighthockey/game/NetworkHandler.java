@@ -69,6 +69,18 @@ public class NetworkHandler {
 			Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
 		}
 	}
+	
+	public void sendSyncMessage(short ID, Vector2 position) {
+		Messages.Synchrate serverSync = (Messages.Synchrate) mMessagePool.obtainMessage(Messages.MESSAGE_ID_SYNC);
+		serverSync.set(ID, position.x, position.y);
+		
+		try {
+			mSocketServer.sendBroadcastServerMessage(serverSync);
+		} catch (IOException e) {}
+		
+		mMessagePool.recycleMessage(serverSync);
+	}
+	
 	public void sendActionMessage(short ID, Vector2 velocity) {
 		Log.i("NETWORK", "Send message");
 		try {

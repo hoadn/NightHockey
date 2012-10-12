@@ -21,7 +21,6 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 
 import android.util.Log;
-import android.view.Display;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -59,9 +58,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
-	    //final Display display = getWindowManager().getDefaultDisplay();
-	    //screenWidth = display.getWidth();
-	    //screenHeight = display.getHeight();
 		final Camera camera = new Camera(0, 0, screenWidth, screenHeight);	
 		
 		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(screenWidth, screenHeight), camera);
@@ -94,6 +90,9 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 					
 					if(velocitySquared >= 0.1) {
 						TouchDetector.listenTouch = false;
+						
+						NetworkHandler nh = NetworkHandler.getInstance();
+						
 						break;
 					}
 				}
