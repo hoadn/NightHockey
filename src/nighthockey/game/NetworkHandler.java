@@ -168,12 +168,14 @@ public class NetworkHandler {
 	private class ServerConnectorListener implements ISocketConnectionServerConnectorListener {
 		@Override
 		public void onStarted(ServerConnector<SocketConnection> pServerConnector) {
-			Log.i("NETWORK", "Server onStarted 2");	
+			Log.i("NETWORK", "Client connected to server");	
+			isConnected = true;
 		}
 
 		@Override
 		public void onTerminated(ServerConnector<SocketConnection> pServerConnector) {
 			Log.i("NETWORK", "Server onTerminated");
+			isConnected = false;
 		}
 	}
 
@@ -197,7 +199,7 @@ public class NetworkHandler {
 	private class ClientConnectorListener implements ISocketConnectionClientConnectorListener {
 		@Override
 		public void onStarted(final ClientConnector<SocketConnection> pConnector) {
-			Log.i("NETWORK", "Client connected");
+			Log.i("NETWORK", "Server receive connection from client");
 			isConnected = true;
 		}
 
