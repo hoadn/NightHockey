@@ -59,19 +59,20 @@ public class Multiplayer extends Activity {
 				
 				if (selectedButton.getText().equals("Server")){
 					net.startServer();		
-					waitClientConnection();
 					startGame.setEnabled(false);
 				}
 				else{
 					Toast.makeText(getBaseContext(), "Start client game. Address:" +connectIp.getText(), Toast.LENGTH_SHORT).show();
 					net.connectClient(connectIp.getText().toString());			
 				}	
+				
+				waitConnection();
 			}
 		});
     }
     
     /* Wait until client has connected to server and send message after that */
-    private void waitClientConnection() {
+    private void waitConnection() {
 		Thread background = new Thread(new Runnable() {
 			@Override
 			public void run() {
