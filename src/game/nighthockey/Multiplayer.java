@@ -4,6 +4,7 @@ import java.net.InetAddress;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -42,13 +43,22 @@ public class Multiplayer extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				selectedButton = (RadioButton)findViewById(radios.getCheckedRadioButtonId());
-				System.out.println("radio := "+selectedButton.getId());
-				selectedButton.getId();
+				NetworkHandler net = NetworkHandler.getInstance();
 				if (selectedButton.getText().equals("Server")){
 					Toast.makeText(getBaseContext(), "Start server game", Toast.LENGTH_SHORT).show();
+					net.startServer();
+					SystemClock.sleep(3000);
+					if(net.isConnected())
+						Toast.makeText(getBaseContext(), "connected", Toast.LENGTH_SHORT).show();					
+					else
+						Toast.makeText(getBaseContext(), "waiting", Toast.LENGTH_SHORT).show();		
+					
 				}
-				else
+				else{
 					Toast.makeText(getBaseContext(), "Start client game. Address:" +connectIp.getText(), Toast.LENGTH_SHORT).show();
+					String ip = connectIp.getText().toString();
+					net.connectClient(ip);
+				}	
 			}
 		});
     }

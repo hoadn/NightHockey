@@ -110,7 +110,10 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 
 		mSocketServer.start();
 	}
-
+	public boolean isConnected(){
+		return mSocketServer.isRunning();
+	}
+	
 	private void initClient() {
 		Log.i("NETWORK", "initClient");
 		try {
@@ -159,7 +162,7 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 		}
 	}
 
-	private class ServerStateListener implements ISocketServerListener<SocketConnectionClientConnector> {
+	private class ServerStateListener implements ISocketServerListener<SocketConnectionClientConnector> {		
 		@Override
 		public void onStarted(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
 			Log.i("NETWORK", "Server onStarted");
