@@ -59,9 +59,9 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
-	    final Display display = getWindowManager().getDefaultDisplay();
-	    screenWidth = display.getWidth();
-	    screenHeight = display.getHeight();
+	    //final Display display = getWindowManager().getDefaultDisplay();
+	    //screenWidth = display.getWidth();
+	    //screenHeight = display.getHeight();
 		final Camera camera = new Camera(0, 0, screenWidth, screenHeight);	
 		
 		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(screenWidth, screenHeight), camera);

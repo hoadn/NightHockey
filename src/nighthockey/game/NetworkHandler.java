@@ -5,11 +5,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
+import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
 import org.andengine.extension.multiplayer.protocol.client.IServerMessageHandler;
 import org.andengine.extension.multiplayer.protocol.client.connector.ServerConnector;
 import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector;
 import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector.ISocketConnectionServerConnectorListener;
+import org.andengine.extension.multiplayer.protocol.server.IClientMessageHandler;
 import org.andengine.extension.multiplayer.protocol.server.SocketServer;
 import org.andengine.extension.multiplayer.protocol.server.SocketServer.ISocketServerListener;
 import org.andengine.extension.multiplayer.protocol.server.connector.ClientConnector;
@@ -70,12 +72,17 @@ public class NetworkHandler {
 	public void sendActionMessage(short ID, Vector2 velocity) {
 		Log.i("NETWORK", "Send message");
 		try {
-			Messages.Move moveFaceServerMessage = (Messages.Move) mMessagePool.obtainMessage(Messages.MESSAGE_ID_MOVE);
-			moveFaceServerMessage.set(ID, velocity.x, velocity.y);
+			Messages.Move serverMove = (Messages.Move) mMessagePool.obtainMessage(Messages.MESSAGE_ID_MOVE);
+			Messages.MoveClient moveClient = (Messages.MoveClient) mMessagePool.obtainMessage(Messages.MESSAGE_ID_MVCL);
+			serverMove.set(ID, velocity.x, velocity.y);
+			moveClient.set(ID, velocity.x, velocity.y);
 
-			mSocketServer.sendBroadcastServerMessage(moveFaceServerMessage);
+			if(mSocketServer != null)
+				mSocketServer.sendBroadcastServerMessage(serverMove);
+			else if(mServerConnector != null)
+				mServerConnector.sendClientMessage(moveClient);
 
-			mMessagePool.recycleMessage(moveFaceServerMessage);
+			mMessagePool.recycleMessage(serverMove);
 		} catch (final IOException e) {
 			Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
 		}
@@ -85,6 +92,7 @@ public class NetworkHandler {
 		mMessagePool.registerMessage(Messages.MESSAGE_ID_SYNC, Messages.Synchrate.class);
 		mMessagePool.registerMessage(Messages.MESSAGE_ID_MOVE, Messages.Move.class);
 		mMessagePool.registerMessage(Messages.MESSAGE_ID_INIT, Messages.Init.class);
+		mMessagePool.registerMessage(Messages.MESSAGE_ID_MVCL, Messages.MoveClient.class);
 	}
 
 	@Override
@@ -108,10 +116,22 @@ public class NetworkHandler {
 		mSocketServer = new SocketServer<SocketConnectionClientConnector>(SERVER_PORT, new ClientConnectorListener(), new ServerStateListener()) {
 			@Override
 			protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
-				Log.i("NETWORK", "newClientConnector");
-				return new SocketConnectionClientConnector(pSocketConnection);
+
+                final SocketConnectionClientConnector clientConnector = new SocketConnectionClientConnector(pSocketConnection);
+                
+                clientConnector.registerClientMessage(Messages.MESSAGE_ID_MVCL, Messages.MoveClient.class, new IClientMessageHandler<SocketConnection>() {
+                        @Override
+                        public void onHandleMessage(final ClientConnector<SocketConnection> pClientConnector, final IClientMessage pClientMessage) throws IOException {
+                            //Message was handled here
+                        	Log.i("NETWORK", "I RECEVED MESSAGE");
+                        }
+                });
+                return clientConnector;
 			}
 		};
+		
+		
+		
 
 		mSocketServer.start();
 	}
@@ -159,8 +179,7 @@ public class NetworkHandler {
 			@Override
 			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
 				Log.i("NETWORK", "onHandleMessage: MOVE");
-				final Messages.Move move = (Messages.Move)pServerMessage;
-				
+				final Messages.Move move = (Messages.Move)pServerMessage;			
 			}
 		});
 	}
