@@ -22,7 +22,7 @@
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name=".Mainmenu"
+            android:name="nighthockey.game.Mainmenu"
             android:label="Night hockey"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
