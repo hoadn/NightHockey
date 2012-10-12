@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -62,20 +61,18 @@ public class Multiplayer extends Activity {
 				if (selectedButton.getText().equals("Server")){
 					net.startServer();
 					
-					Thread background=new Thread(new Runnable() {
-						   @Override
-						   public void run() {
-						     try {
-						    	Thread.sleep(1000);
-						    	Log.i("thread","thre");
-						    	handler.handleMessage(handler.obtainMessage());
-						     } catch (Exception e) {
-						    	
-						     }  
-						   }
-						  });
+				Thread background=new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(1000);
+							Log.i("thread","thre");
+							handler.sendMessage(handler.obtainMessage());
+						} catch (Exception e) {}  
+					}
+				});
 
-						  background.start();
+				background.start();
 						
 					
 				}
