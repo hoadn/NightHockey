@@ -78,7 +78,7 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 	protected void finalize() {
 		if(this.mSocketServer != null) {
 			try {
-				mSocketServer.sendBroadcastServerMessage(new ConnectionCloseServerMessage());
+				mSocketServer.sendBroadcastServerMessage(new Messages.ConnectionCloseServer());
 			} catch (final IOException e) {
 				Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
 			}
@@ -119,7 +119,7 @@ public class NetworkHandler implements ClientMessageFlags, ServerMessageFlags {
 		try {
 			mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(ipAddress, SERVER_PORT)), new ServerConnectorListener());
 
-			mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_CONNECTION_CLOSE, ConnectionCloseServerMessage.class, new IServerMessageHandler<SocketConnection>() {
+			mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_CONNECTION_CLOSE, Messages.ConnectionCloseServer.class, new IServerMessageHandler<SocketConnection>() {
 				@Override
 				public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
 					Log.i("NETWORK", "onHandleMessage: we lost connection to server");

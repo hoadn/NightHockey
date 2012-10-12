@@ -20,8 +20,8 @@ public class SpotLight extends Sprite {
 		super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
 		
 		double random = Math.random();
-		float x = (float) (random * NightHockeyActivity.screenWidth);
-		float y = (float) (random * NightHockeyActivity.screenHeight);
+		float x = (float) (random * NightHockeyActivity.screenWidth - 100);
+		float y = (float) (random * NightHockeyActivity.screenHeight - 100);
 		setPosition(x, y);
 		
 		setBlendingEnabled(true);

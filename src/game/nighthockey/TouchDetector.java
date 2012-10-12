@@ -7,17 +7,19 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.input.touch.TouchEvent;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import android.util.Log;
 import android.view.MotionEvent;
 
 public class TouchDetector implements IOnSceneTouchListener {
+	public static boolean listenTouch = true;
+	
 	private PhysicsWorld physics;
 	private double startTime;
 	private Vector2 downPosition;
-	public static boolean listenTouch = true;
+	private boolean online = false;
 	
-	public TouchDetector(PhysicsWorld physics) {
+	public TouchDetector(PhysicsWorld physics, boolean online) {
 		this.physics = physics;
+		this.online = online;
 	}
 
 	@Override
@@ -58,16 +60,15 @@ public class TouchDetector implements IOnSceneTouchListener {
 				
 				if(player.isActive) {
 					double deltaTime = (System.currentTimeMillis() - startTime) / 100;
-					Log.i("Distance", "deltaTime f" + deltaTime);
 					
 					Vector2 distance = new Vector2(upPosition.x - downPosition.x, upPosition.y - downPosition.y);
 					Vector2 speed = new Vector2(distance.x / (float)deltaTime, distance.y / (float)deltaTime);
 					
-					Log.i("Distance", "Speed " + speed.x + " " + speed.y);
-					
 					player.body.setLinearVelocity(speed);
-					NetworkHandler handler = NetworkHandler.getInstance();
-					handler.sendActionMessage(player.getID(), speed);
+					if(online) {
+						NetworkHandler handler = NetworkHandler.getInstance();
+						handler.sendActionMessage(player.getID(), speed);
+					}
 					
 					listenTouch = false;
 					player.isActive = false;

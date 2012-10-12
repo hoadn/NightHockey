@@ -15,6 +15,7 @@ class Puck extends Sprite {
 	final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	final Body body;
 	protected boolean isHockeyplayer = false;
+	final short ID = -1;
 	
 	public Puck(final float pX, final float pY, final TextureRegion pTextureRegion, 
 						final VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld) {
@@ -25,6 +26,12 @@ class Puck extends Sprite {
 		body.setLinearDamping(0.3f);
 		body.setAngularDamping(0.3f);
 		
+		setAlpha(0.2f);
+		
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
+	}
+	
+	public short getID() {
+		return ID;
 	}
 }
