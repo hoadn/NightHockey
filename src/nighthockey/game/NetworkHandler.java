@@ -141,9 +141,6 @@ public class NetworkHandler {
                 return clientConnector;
 			}
 		};
-		
-		
-		
 
 		mSocketServer.start();
 	}

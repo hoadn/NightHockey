@@ -42,6 +42,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	
 	/* Game states and timers to it */
 	public static boolean ONLINE_GAME = true;
+	public static boolean SERVER = false;
 	Timer startTimer;
 	
 	/* Texture handles */
@@ -91,8 +92,11 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 					if(velocitySquared >= 0.1) {
 						TouchDetector.listenTouch = false;
 						
-						NetworkHandler nh = NetworkHandler.getInstance();
-						
+						if(SERVER) {
+							NetworkHandler nh = NetworkHandler.getInstance();
+							HockeyPlayer player = (HockeyPlayer) body.getUserData();
+							nh.sendSyncMessage(player.getID(), body.getPosition());
+						}						
 						break;
 					}
 				}

@@ -58,7 +58,8 @@ public class Multiplayer extends Activity {
 				NetworkHandler net = NetworkHandler.getInstance();
 				
 				if (selectedButton.getText().equals("Server")){
-					net.startServer();		
+					net.startServer();
+					NightHockeyActivity.SERVER = true;
 					startGame.setEnabled(false);
 				}
 				else{
