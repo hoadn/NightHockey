@@ -73,10 +73,8 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			x = pDataInputStream.readFloat();
 			y = pDataInputStream.readFloat();
 			
-			Log.i("NETWORK", "SERVER onReadTransmissionData " + ID + " " + x + " " + " " + y);
 			PhysicsWorld physics = NightHockeyActivity.getPhysics();
 			Iterator<Body> bodies = physics.getBodies();
-			TouchDetector.listenTouch = true;
 			
 			while(bodies.hasNext()) {
 				Body body = bodies.next();
@@ -129,8 +127,6 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			mX = pDataInputStream.readFloat();
 			mY = pDataInputStream.readFloat();
 			
-			Log.i("NETWORK", "CLIENT onReadTransmissionData:" + ID + " " + mX + " " + mY);
-			
 			PhysicsWorld physics = NightHockeyActivity.getPhysics();
 			Iterator<Body> bodies = physics.getBodies();
 			TouchDetector.listenTouch = true;
@@ -169,7 +165,6 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		}
 
 		public void set(final short pID, final float pX, final float pY) {
-			Log.i("NETWORK", "set message");
 			ID = pID;
 			mX = pX;
 			mY = pY;

@@ -90,18 +90,16 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 					float velocitySquared = (float)bodyVelocity.len2();
 					
 					if(velocitySquared >= 0.1) {
-						TouchDetector.listenTouch = false;
-						
-						if(SERVER) {
-							NetworkHandler nh = NetworkHandler.getInstance();
-							Drawable player = (Drawable) body.getUserData();
-							if(player == null) {
-								Log.e("NETWORK", "player object is null");
-								continue;
-							}
-							nh.sendSyncMessage(player.getID(), body.getPosition());
-						}						
+						TouchDetector.listenTouch = false;			
 					}
+					if(SERVER && velocitySquared <= 0.1) {
+						NetworkHandler nh = NetworkHandler.getInstance();
+						Drawable player = (Drawable) body.getUserData();
+						if(player == null) {
+							continue;
+						}
+						nh.sendSyncMessage(player.getID(), body.getPosition());
+					}			
 				}
 		    }
 		});

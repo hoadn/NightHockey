@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 class Puck extends Sprite implements Drawable {
 	final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-	final Body body;
+	protected final Body body;
 	protected boolean isHockeyplayer = false;
 	final short ID = -1;
 	protected boolean isActive = false; /* if current body is set to move */
