@@ -180,7 +180,7 @@ public class NetworkHandler {
 			@Override
 			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
 				Log.i("NETWORK", "onHandleMessage: SYNC");
-				final Messages.Synchrate sync = (Messages.Synchrate)pServerMessage;
+				//final Messages.Synchrate sync = (Messages.Synchrate)pServerMessage;
 			}
 		});
 
@@ -188,7 +188,7 @@ public class NetworkHandler {
 			@Override
 			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
 				Log.i("NETWORK", "onHandleMessage: MOVE");
-				final Messages.Move move = (Messages.Move)pServerMessage;			
+				//final Messages.Move move = (Messages.Move)pServerMessage;			
 			}
 		});
 	}

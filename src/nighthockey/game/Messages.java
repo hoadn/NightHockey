@@ -80,11 +80,11 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			
 			while(bodies.hasNext()) {
 				Body body = bodies.next();
-				HockeyPlayer player = (HockeyPlayer) body.getUserData();
+				Drawable player = (Drawable) body.getUserData();
 				if(player == null) continue;
 				
 				if(player.getID() == ID)
-					player.body.setTransform(new Vector2(x,y), 0);
+					player.getBody().setTransform(new Vector2(x,y), 0);
 			}
 		}
 
@@ -137,11 +137,11 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			
 			while(bodies.hasNext()) {
 				Body body = bodies.next();
-				HockeyPlayer player = (HockeyPlayer) body.getUserData();
+				Drawable player = (Drawable) body.getUserData();
 				if(player == null) continue;
 				
 				if(player.getID() == ID)
-					player.body.setLinearVelocity(new Vector2(mX,mY));
+					player.getBody().setLinearVelocity(new Vector2(mX,mY));
 			}
 		}
 
@@ -194,11 +194,11 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			
 			while(bodies.hasNext()) {
 				Body body = bodies.next();
-				HockeyPlayer player = (HockeyPlayer) body.getUserData();
+				Drawable player = (Drawable) body.getUserData();
 				if(player == null) continue;
 				
 				if(player.getID() == ID)
-					player.body.setLinearVelocity(new Vector2(mX,mY));
+					player.getBody().setLinearVelocity(new Vector2(mX,mY));
 			}
 		}
 

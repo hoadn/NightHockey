@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
-class HockeyPlayer extends Sprite  {
+class HockeyPlayer extends Sprite implements Drawable {
 	public static short ID = 0;
 	
 	protected final Body body;
@@ -28,7 +28,7 @@ class HockeyPlayer extends Sprite  {
 		playerID = ID++;
 		
 		/* save location where player is in start */
-		startLocation.set(pX, pX);
+		startLocation = new Vector2(pX, pY);
 		
 		body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, FIXTURE_DEF);
 		body.setLinearDamping(0.8f);
@@ -47,5 +47,40 @@ class HockeyPlayer extends Sprite  {
 	
 	public short getID() {
 		return playerID;
+	}
+
+	@Override
+	public int getXposition() {
+		return (int) getX();
+	}
+
+	@Override
+	public int getYposition() {
+		return (int) getY();
+	}
+
+	@Override
+	public int getWidthOfSpite() {
+		return (int) getWidth();
+	}
+
+	@Override
+	public int getHeightOfSprite() {
+		return (int) getHeight();
+	}
+
+	@Override
+	public void isActive(boolean active) {
+		isActive = active;
+	}
+
+	@Override
+	public boolean isActive() {
+		return isActive;
+	}
+
+	@Override
+	public Body getBody() {
+		return body;
 	}
 }

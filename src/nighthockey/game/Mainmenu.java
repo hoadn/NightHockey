@@ -20,7 +20,8 @@ public class Mainmenu extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				NightHockeyActivity.ONLINE_GAME = false;
+				NightHockeyActivity.SERVER = false;
 				Intent intent = new Intent(getBaseContext(), NightHockeyActivity.class);
 				startActivity(intent);
 			}
@@ -31,7 +32,6 @@ public class Mainmenu extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(getBaseContext(), Multiplayer.class);
 				startActivity(intent);
 			}

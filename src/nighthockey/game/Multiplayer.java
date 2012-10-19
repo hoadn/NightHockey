@@ -54,6 +54,7 @@ public class Multiplayer extends Activity {
         startGame.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				NightHockeyActivity.ONLINE_GAME = true;
 				selectedButton = (RadioButton)findViewById(radios.getCheckedRadioButtonId());
 				NetworkHandler net = NetworkHandler.getInstance();
 				
@@ -64,6 +65,7 @@ public class Multiplayer extends Activity {
 				}
 				else{
 					Toast.makeText(getBaseContext(), "Start client game. Address:" +connectIp.getText(), Toast.LENGTH_SHORT).show();
+					NightHockeyActivity.SERVER = false;
 					net.connectClient(connectIp.getText().toString());			
 				}	
 				

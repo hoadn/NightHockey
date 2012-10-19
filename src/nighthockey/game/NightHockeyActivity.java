@@ -41,7 +41,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	}
 	
 	/* Game states and timers to it */
-	public static boolean ONLINE_GAME = true;
+	public static boolean ONLINE_GAME = false;
 	public static boolean SERVER = false;
 	Timer startTimer;
 	
@@ -94,10 +94,13 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 						
 						if(SERVER) {
 							NetworkHandler nh = NetworkHandler.getInstance();
-							HockeyPlayer player = (HockeyPlayer) body.getUserData();
+							Drawable player = (Drawable) body.getUserData();
+							if(player == null) {
+								Log.e("NETWORK", "player object is null");
+								continue;
+							}
 							nh.sendSyncMessage(player.getID(), body.getPosition());
 						}						
-						break;
 					}
 				}
 		    }
@@ -152,7 +155,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		scene.attachChild(right);
 		
 		createHockeyPlayers();
-		Log.i("NETWORK", "Test message");
 		
 		return scene;
 	}

@@ -31,19 +31,20 @@ public class TouchDetector implements IOnSceneTouchListener {
 				
 				while(bodies.hasNext()) {
 					Body body = bodies.next();
-					HockeyPlayer player = (HockeyPlayer) body.getUserData();
+					Drawable player = (Drawable) body.getUserData();
 					if(player == null) continue;
-					if(player.isHockeyplayer == false) continue;
+					if(player.getID() == -1) continue; // TODO move -1 into namespace
 	
-					Vector2 distance = new Vector2((player.getX() + player.getWidth()/2) - downPosition.x,(player.getY() + player.getHeight()/2) - downPosition.y);
+					Vector2 distance = new Vector2((player.getXposition() + player.getWidthOfSpite()/2) - downPosition.x,
+							(player.getYposition() + player.getHeightOfSprite()/2) - downPosition.y);
 					
 					if(distance.x < 0) distance.x *= -1;
 					if(distance.y < 0) distance.y *= -1;
 					
-					if(distance.y <= player.getWidth() && distance.x <= player.getWidth()) {
+					if(distance.y <= player.getWidthOfSpite() && distance.x <= player.getWidthOfSpite()) {
 						startTime = System.currentTimeMillis();
 	
-						player.isActive = true;
+						player.isActive(true);
 						break;
 	
 					}
@@ -55,16 +56,16 @@ public class TouchDetector implements IOnSceneTouchListener {
 			
 			while(bodies.hasNext()) {
 				Body body = bodies.next();
-				HockeyPlayer player = (HockeyPlayer) body.getUserData();
+				Drawable player = (Drawable) body.getUserData();
 				if(player == null) continue;
 				
-				if(player.isActive) {
+				if(player.isActive()) {
 					double deltaTime = (System.currentTimeMillis() - startTime) / 100;
 					
 					Vector2 distance = new Vector2(upPosition.x - downPosition.x, upPosition.y - downPosition.y);
 					Vector2 speed = new Vector2(distance.x / (float)deltaTime, distance.y / (float)deltaTime);
 					
-					player.body.setLinearVelocity(speed);
+					player.getBody().setLinearVelocity(speed);
 					
 					if(online) {
 						NetworkHandler handler = NetworkHandler.getInstance();
@@ -72,7 +73,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 					}
 					
 					listenTouch = false;
-					player.isActive = false;
+					player.isActive(false);
 					break;
 				}
 			}
