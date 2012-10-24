@@ -10,6 +10,7 @@ import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.text.Text;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
@@ -50,10 +51,12 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	private TextureRegion spotLightTexture;
 	private BitmapTextureAtlas textureAtlas;
 	
-	/* Game objects */
-	ArrayList<HockeyPlayer> hockeyPlayers = new ArrayList<HockeyPlayer>();	
-	ArrayList<SpotLight> spotLights = new ArrayList<SpotLight>();
-	Puck puck;
+	/* Game objects and calculators */
+	private ArrayList<HockeyPlayer> hockeyPlayers = new ArrayList<HockeyPlayer>();	
+	private ArrayList<SpotLight> spotLights = new ArrayList<SpotLight>();
+	private Puck puck;
+	private Text goalHome;
+	
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
