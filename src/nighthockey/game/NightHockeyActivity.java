@@ -20,8 +20,6 @@ import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 
-import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -66,9 +64,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 
 	@Override
 	public void onCreateResources() {
-		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
-		
-		textureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 256, 256, TextureOptions.BILINEAR);
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");	
+		textureAtlas	 = new BitmapTextureAtlas(this.getTextureManager(), 256, 256, TextureOptions.BILINEAR);
 		homeTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "home.png", 0, 0);
 		visitorTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "visitor.png", 64, 0);
 		puckTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "puck.png", 128, 0);
@@ -161,21 +158,22 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 	
 		/* Set first team */
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 200, (screenHeight/2) - 50 , homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 200, (screenHeight/2) + 50 , homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 100, (screenHeight/2) - 100, homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 100, (screenHeight/2) - 000, homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 100, (screenHeight/2) + 100, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 250, (screenHeight/2) - 60 , homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 250, (screenHeight/2) + 50 , homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) - 110, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) - 10, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) + 100, homeTexture, vbo, physics));
 		/* Set second team */
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 200, (screenHeight/2) - 50 , visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 200, (screenHeight/2) + 50 , visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 100, (screenHeight/2) - 100, visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 100, (screenHeight/2) - 000, visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 100, (screenHeight/2) + 100, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 240, (screenHeight/2) - 60 , visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 240, (screenHeight/2) + 50 , visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) - 110, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) - 10, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) + 100, visitorTexture, vbo, physics));
 
 		puck = new Puck(screenWidth/2, screenHeight/2, puckTexture, vbo, physics);
-		for(int i = 0; i <= 5; i++) {
-			spotLights.add(new SpotLight(400, 300, spotLightTexture, vbo));
+		for(int i = 0; i <= 2; i++) {
+			float random = (float) (50 + (Math.random() * (600 - 50) + 1));
+			spotLights.add(new SpotLight(random, random, spotLightTexture, vbo));
 		}
 		
 		for(HockeyPlayer player : hockeyPlayers) {
