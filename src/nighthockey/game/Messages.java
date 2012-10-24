@@ -75,6 +75,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			y = pDataInputStream.readFloat();
 			
 			PhysicsWorld physics = NightHockeyActivity.getPhysics();
+			if(physics == null) return;
 			Iterator<Body> bodies = physics.getBodies();
 			
 			while(bodies.hasNext()) {
