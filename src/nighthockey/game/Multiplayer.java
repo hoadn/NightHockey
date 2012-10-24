@@ -44,7 +44,7 @@ public class Multiplayer extends Activity {
         radios = (RadioGroup)findViewById(R.id.radioGroup1);
         startGame = (Button)findViewById(R.id.buttonStart);
         connectIp = (EditText)findViewById(R.id.editText1);
-        connectIp.setText("000.000.000.000");
+        connectIp.setText("192.168.1.31");
         
         try{
             InetAddress ownIP=InetAddress.getLocalHost();

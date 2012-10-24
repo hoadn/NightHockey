@@ -138,18 +138,21 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		final VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 		final Rectangle ground = new Rectangle(0, screenHeight - 2, screenWidth, 2, vbo);
 		final Rectangle roof = new Rectangle(0, 0, screenWidth, 2, vbo);
-		final Rectangle left = new Rectangle(0, 0, 2, screenHeight, vbo);
+		final Rectangle leftRoof = new Rectangle(0, 0, 2, (float) (screenHeight*0.33), vbo);
+		final Rectangle leftGround = new Rectangle(0,(float) (screenHeight*0.66),2,screenHeight,vbo);
 		final Rectangle right = new Rectangle(screenWidth - 2, 0, 2, screenHeight, vbo);
 
 		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0, 0.5f, 0.5f);
 		PhysicsFactory.createBoxBody(physics, ground, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(physics, roof, BodyType.StaticBody, wallFixtureDef);
-		PhysicsFactory.createBoxBody(physics, left, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(physics, leftRoof, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(physics, leftGround, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(physics, right, BodyType.StaticBody, wallFixtureDef);
 		
 		scene.attachChild(ground);
 		scene.attachChild(roof);
-		scene.attachChild(left);
+		scene.attachChild(leftGround);
+		scene.attachChild(leftRoof);
 		scene.attachChild(right);
 		
 		createHockeyPlayers();
