@@ -7,6 +7,7 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -15,7 +16,8 @@ class Puck extends Sprite implements Drawable {
 	final FixtureDef fixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	protected final Body body;
 	protected boolean isHockeyplayer = false;
-	final short ID = -1;
+	private Vector2 startPosition;
+
 	protected boolean isActive = false; /* if current body is set to move */
 	
 	public Puck(final float pX, final float pY, final TextureRegion pTextureRegion, 
@@ -32,10 +34,17 @@ class Puck extends Sprite implements Drawable {
 		setAlpha(0.2f);
 		
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
+		
+		startPosition = new Vector2(body.getPosition());
+	}
+	
+	public void resetPosition() {
+		body.setLinearVelocity(0, 0);
+		body.setTransform(startPosition, 0);
 	}
 	
 	public short getID() {
-		return ID;
+		return puckID;
 	}
 
 	@Override
@@ -59,7 +68,7 @@ class Puck extends Sprite implements Drawable {
 	}
 
 	@Override
-	public void isActive(boolean active) {
+	public void setActive(boolean active) {
 		isActive = active;
 	}
 

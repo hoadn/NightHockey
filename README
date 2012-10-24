@@ -5,16 +5,13 @@ Multiplayer works over wifi and other phone is server other is client.
 Game is turn based where player swipes players and tryies to put puck into enemys goal.
 
 TODO:
-- Goals
-- Goal points
 - Timer calculator for turns and game
 - Ice
-- Network client -> server
 - Messages between client/server
 	- Goals
-	- Sync
 	- Turns
 - Main menu
 - Movement effects(particles)
 - Better lighting
 - Game turns
+- set Messages into namespace insteat of the class

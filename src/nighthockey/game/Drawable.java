@@ -9,6 +9,8 @@ public interface Drawable {
 	public int getYposition();
 	public int getWidthOfSpite();
 	public int getHeightOfSprite();
-	public void isActive(boolean active);
+	public void setActive(boolean active);
 	public boolean isActive();
+	
+	public short puckID = -1;
 }

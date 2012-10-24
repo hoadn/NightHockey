@@ -11,30 +11,31 @@ import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.text.Text;
+import org.andengine.entity.text.TextOptions;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
+import org.andengine.util.HorizontalAlign;
+
+import android.graphics.Typeface;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	/* Environment */
 	public static int screenWidth = 800;
 	public static int screenHeight = 480;
-	public static final short CATEGORY_PUCK = 0x1;
-	public static final short CATEGORY_WALL = 0x2;
-	public static final short CATEGORY_PLAYER = 0x3;
-	public static final short CATEGORY_ALL = 0xFF;
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
@@ -47,6 +48,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	/* Game states and timers to it */
 	public static boolean ONLINE_GAME = false;
 	public static boolean SERVER = false;
+	public static boolean SINGLE_GAME = true;
 	Timer startTimer;
 	
 	/* Texture handles */
@@ -60,9 +62,23 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	private ArrayList<HockeyPlayer> hockeyPlayers = new ArrayList<HockeyPlayer>();	
 	private ArrayList<SpotLight> spotLights = new ArrayList<SpotLight>();
 	private Puck puck;
+	private Font mFont;
 	private Text goalHome;
+	private Text goalVisitor;
+	private int homeGoals = 0;
+	private int visitorGoals = 0;
+	public static final short HOME = 0x1;
+	public static final short VISITOR = 0x2;
+	protected static short GOAL = 0x0;
+	protected short NO_GOAL = GOAL;
 	
-	
+	/* Game collision categories */
+	public static final short CATEGORY_PUCK = 0x1;
+	public static final short CATEGORY_WALL = 0x2;
+	public static final short CATEGORY_PLAYER = 0x3;
+	public static final short CATEGORY_ALL = 0xFF;
+
+
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		final Camera camera = new Camera(0, 0, screenWidth, screenHeight);	
@@ -79,13 +95,32 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		puckTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "puck.png", 128, 0);
 		spotLightTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "spotlight.png", 0, 64);
 		textureAtlas.load();
+		
+		mFont = FontFactory.create(this.getFontManager(), this.getTextureManager(), 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32);
+		mFont.load();
+	}
+	
+	public static void goalHasBeenMade(short goalMaker) {
+		GOAL = goalMaker;
 	}
 
 	@Override
-	public Scene onCreateScene() {		
+	public Scene onCreateScene() {
+		if(SERVER || ONLINE_GAME) SINGLE_GAME = false;
+		
 		/* check every 0.5 sec that is bodies moving or not */
 		Timer moveCheckTimer = new Timer(0.5f, new Timer.TimerCalculator() {
-		    public void onTick() {
+		    public void onTick() {   		
+	    		if(GOAL == VISITOR) {
+	    			GOAL = NO_GOAL;
+	    			setVisitorGoal();
+	    			return;
+	    		} else if(GOAL == HOME) {
+	    			GOAL = NO_GOAL;
+	    			setHomeGoal();
+	    			return;
+	    		}
+
 				Iterator<Body> bodies = physics.getBodies();
 				TouchDetector.listenTouch = true;
 				
@@ -93,18 +128,33 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 					Body body = bodies.next();
 					Vector2 bodyVelocity = body.getLinearVelocity();
 					float velocitySquared = (float)bodyVelocity.len2();
+					Drawable object = (Drawable) body.getUserData();
+					if(object == null) continue;
 					
+					/* check if goal */
+					if(object.getID() == Drawable.puckID && (SERVER || SINGLE_GAME)) {
+						NetworkHandler nh = NetworkHandler.getInstance();
+						if(object.getXposition() < 0) {
+							setVisitorGoal();
+							
+							if(SERVER) {
+								nh.sendGoalMessage(VISITOR);
+							}
+						} else if(object.getXposition() > screenWidth) {
+							setHomeGoal();
+							
+							if(SERVER) {
+								nh.sendGoalMessage(HOME);
+							} 
+						}
+					}
+									
 					if(velocitySquared >= 0.1) {
 						TouchDetector.listenTouch = false;			
-					}
-					if(SERVER && velocitySquared <= 0.1) {
+					} else if(SERVER && velocitySquared <= 0.1) { 
 						NetworkHandler nh = NetworkHandler.getInstance();
-						Drawable player = (Drawable) body.getUserData();
-						if(player == null) {
-							continue;
-						}
-						nh.sendSyncMessage(player.getID(), body.getPosition());
-					}			
+						nh.sendSyncMessage(object.getID(), body.getPosition());
+					} 
 				}
 		    }
 		});
@@ -162,8 +212,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		PhysicsFactory.createBoxBody(physics, rightRoof, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(physics, rightGround, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(physics, goalHome, BodyType.StaticBody, goalFixtureDef);
-		PhysicsFactory.createBoxBody(physics, goalVisitor, BodyType.StaticBody, goalFixtureDef);
-		
+		PhysicsFactory.createBoxBody(physics, goalVisitor, BodyType.StaticBody, goalFixtureDef);	
 		
 		scene.attachChild(ground);
 		scene.attachChild(roof);
@@ -174,7 +223,35 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		
 		createHockeyPlayers();
 		
+		/* Draw goal situation */
+		this.goalHome = new Text(100,40,mFont, "0", new TextOptions(HorizontalAlign.CENTER), vbo);
+		this.goalVisitor = new Text(screenWidth - 100, 40, mFont, "0", new TextOptions(HorizontalAlign.CENTER), vbo);
+		
+		scene.attachChild(this.goalHome);
+		scene.attachChild(this.goalVisitor);
+
 		return scene;
+	}
+
+	/* Client set goal from server */
+	protected void setHomeGoal() {
+		resetGame();
+		homeGoals++;
+		goalHome.setText("" + homeGoals);	
+	}
+
+	/* Client set goal from server */
+	protected void setVisitorGoal() {
+		resetGame();
+		visitorGoals++;
+		goalVisitor.setText("" + visitorGoals);	
+	}
+
+	protected void resetGame() {
+		for(HockeyPlayer player : hockeyPlayers)
+			player.resetPosition();
+		
+		puck.resetPosition();
 	}
 
 	private void createHockeyPlayers() {

@@ -7,6 +7,8 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -27,8 +29,7 @@ class HockeyPlayer extends Sprite implements Drawable {
 		super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
 		playerID = ID++;
 		
-		/* save location where player is in start */
-		startLocation = new Vector2(pX, pY);
+
 		
 		fixtureDef.filter.categoryBits = NightHockeyActivity.CATEGORY_PLAYER;
 		fixtureDef.filter.maskBits = NightHockeyActivity.CATEGORY_ALL;
@@ -41,9 +42,13 @@ class HockeyPlayer extends Sprite implements Drawable {
 		body.setUserData(this);
 		
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
+		
+		/* save location where player is in start */
+		startLocation = new Vector2(body.getPosition());
 	}
 	
 	public void resetPosition() {
+		body.setLinearVelocity(0, 0);
 		body.setTransform(startLocation, 0);
 	}
 	
@@ -72,7 +77,7 @@ class HockeyPlayer extends Sprite implements Drawable {
 	}
 
 	@Override
-	public void isActive(boolean active) {
+	public void setActive(boolean active) {
 		isActive = active;
 	}
 

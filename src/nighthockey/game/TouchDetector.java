@@ -44,7 +44,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 					if(distance.y <= player.getWidthOfSpite() && distance.x <= player.getWidthOfSpite()) {
 						startTime = System.currentTimeMillis();
 	
-						player.isActive(true);
+						player.setActive(true);
 						break;
 	
 					}
@@ -73,7 +73,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 					}
 					
 					listenTouch = false;
-					player.isActive(false);
+					player.setActive(false);
 					break;
 				}
 			}

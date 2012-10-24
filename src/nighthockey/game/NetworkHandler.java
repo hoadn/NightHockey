@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import nighthockey.game.Messages.GoalMessage;
+
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -57,6 +59,17 @@ public class NetworkHandler {
 		
 		Log.i("NETWORK", "startClient");
 		initClient();
+	}
+	
+	public void sendGoalMessage(short goalMaker) {
+		Messages.GoalMessage goal = (Messages.GoalMessage) mMessagePool.obtainMessage(Messages.MESSAGE_ID_SYNC);
+		goal.setGoalMaker(goalMaker);
+		
+		try {
+			mSocketServer.sendBroadcastServerMessage(goal);
+		} catch (IOException e) {}
+		
+		mMessagePool.recycleMessage(goal);
 	}
 	
 	public void sendInitMessage(String name){

@@ -15,10 +15,11 @@ import com.badlogic.gdx.physics.box2d.Body;
 import android.util.Log;
 
 public class Messages implements ClientMessageFlags, ServerMessageFlags {
-	public static final short MESSAGE_ID_SYNC = 1;
-	public static final short MESSAGE_ID_MOVE = 2;
-	public static final short MESSAGE_ID_INIT = 3;
-	public static final short MESSAGE_ID_MVCL = 4;
+	public static final short MESSAGE_ID_SYNC = 0x01;
+	public static final short MESSAGE_ID_MOVE = 0x02;
+	public static final short MESSAGE_ID_INIT = 0x04;
+	public static final short MESSAGE_ID_MVCL = 0x08;
+	public static final short MESSAGE_ID_SRGL = 0x16;
 	
 	public Messages() {
 	}
@@ -82,7 +83,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 				if(player == null) continue;
 				
 				if(player.getID() == ID)
-					player.getBody().setTransform(new Vector2(x,y), 0);
+					player.getBody().setTransform(new Vector2(x,y), player.getBody().getAngle());
 			}
 		}
 
@@ -206,6 +207,31 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		}
 	}
 	
+	public static class GoalMessage extends ServerMessage {
+		public short goalMaker;
+		
+		public void setGoalMaker(short gm) {
+			goalMaker = gm;
+		}
+
+		@Override
+		public short getFlag() {
+			return MESSAGE_ID_SRGL;
+		}
+
+		@Override
+		protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
+			goalMaker = pDataInputStream.readShort();
+			NightHockeyActivity.goalHasBeenMade(goalMaker);
+		}
+
+		@Override
+		protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
+			pDataOutputStream.writeShort(goalMaker);
+		}
+		
+	}
+	
 	public static class Init extends ClientMessage {
 		public String name;
 		public Init(){
@@ -218,14 +244,12 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		}
 
 		@Override
-		protected void onReadTransmissionData(DataInputStream pDataInputStream)
-				throws IOException {
+		protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
 			name = pDataInputStream.readUTF();
 		}
 
 		@Override
-		protected void onWriteTransmissionData(
-				DataOutputStream pDataOutputStream) throws IOException {
+		protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
 			pDataOutputStream.writeUTF(name);
 		}	
 	}
