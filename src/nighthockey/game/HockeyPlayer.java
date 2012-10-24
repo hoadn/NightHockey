@@ -34,7 +34,7 @@ class HockeyPlayer extends Sprite implements Drawable {
 		body.setLinearDamping(0.8f);
 		body.setAngularDamping(0.8f);
 		
-		setAlpha(0.2f);
+		setAlpha(0.3f);
 		
 		body.setUserData(this);
 		
