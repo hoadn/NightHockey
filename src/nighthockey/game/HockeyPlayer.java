@@ -18,7 +18,7 @@ class HockeyPlayer extends Sprite implements Drawable {
 	protected final Body body;
 	protected boolean isActive = false; /* if current body is set to move */
 	protected boolean isHockeyplayer = true;
-	private final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
+	private final FixtureDef fixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	private short playerID;
 	private Vector2 startLocation;
 	
@@ -30,7 +30,9 @@ class HockeyPlayer extends Sprite implements Drawable {
 		/* save location where player is in start */
 		startLocation = new Vector2(pX, pY);
 		
-		body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, FIXTURE_DEF);
+		fixtureDef.filter.categoryBits = NightHockeyActivity.CATEGORY_PLAYER;
+		fixtureDef.filter.maskBits = NightHockeyActivity.CATEGORY_ALL;
+		body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, fixtureDef);
 		body.setLinearDamping(0.8f);
 		body.setAngularDamping(0.8f);
 		
