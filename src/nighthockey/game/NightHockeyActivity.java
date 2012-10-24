@@ -24,12 +24,17 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	/* Environment */
 	public static int screenWidth = 800;
 	public static int screenHeight = 480;
+	public static final short CATEGORY_PUCK = 0x1;
+	public static final short CATEGORY_WALL = 0x2;
+	public static final short CATEGORY_PLAYER = 0x3;
+	public static final short CATEGORY_ALL = 0xFF;
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
@@ -140,20 +145,32 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		final Rectangle roof = new Rectangle(0, 0, screenWidth, 2, vbo);
 		final Rectangle leftRoof = new Rectangle(0, 0, 2, (float) (screenHeight*0.33), vbo);
 		final Rectangle leftGround = new Rectangle(0,(float) (screenHeight*0.66),2,screenHeight,vbo);
-		final Rectangle right = new Rectangle(screenWidth - 2, 0, 2, screenHeight, vbo);
-
+		final Rectangle rightRoof = new Rectangle(screenWidth - 2, 0, 2, (float) (screenHeight*0.33), vbo);
+		final Rectangle rightGround = new Rectangle(screenWidth - 2,(float) (screenHeight*0.66), 2,screenHeight, vbo);
+		
+		final Rectangle goalVisitor = new Rectangle(screenWidth - 10, (float) (screenHeight*0.33), 10, (float) (screenHeight*0.33), vbo);
+		final Rectangle goalHome = new Rectangle(0, (float) (screenHeight*0.33), 10, (float) (screenHeight*0.33), vbo);
+		
 		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0, 0.5f, 0.5f);
+		final FixtureDef goalFixtureDef = PhysicsFactory.createFixtureDef(0, 0.5f, 0.5f);
+		wallFixtureDef.filter.categoryBits = CATEGORY_WALL;
+		
 		PhysicsFactory.createBoxBody(physics, ground, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(physics, roof, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(physics, leftRoof, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(physics, leftGround, BodyType.StaticBody, wallFixtureDef);
-		PhysicsFactory.createBoxBody(physics, right, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(physics, rightRoof, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(physics, rightGround, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(physics, goalHome, BodyType.StaticBody, goalFixtureDef);
+		PhysicsFactory.createBoxBody(physics, goalVisitor, BodyType.StaticBody, goalFixtureDef);
+		
 		
 		scene.attachChild(ground);
 		scene.attachChild(roof);
 		scene.attachChild(leftGround);
 		scene.attachChild(leftRoof);
-		scene.attachChild(right);
+		scene.attachChild(rightRoof);
+		scene.attachChild(rightGround);
 		
 		createHockeyPlayers();
 		

@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 class Puck extends Sprite implements Drawable {
-	final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
+	final FixtureDef fixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	protected final Body body;
 	protected boolean isHockeyplayer = false;
 	final short ID = -1;
@@ -21,8 +21,9 @@ class Puck extends Sprite implements Drawable {
 	public Puck(final float pX, final float pY, final TextureRegion pTextureRegion, 
 						final VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld) {
 		super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
-		
-		body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, FIXTURE_DEF);
+		fixtureDef.filter.categoryBits = NightHockeyActivity.CATEGORY_PUCK;
+		fixtureDef.filter.maskBits = NightHockeyActivity.CATEGORY_WALL;
+		body = PhysicsFactory.createCircleBody(physicsWorld, this, BodyType.DynamicBody, fixtureDef);
 		
 		body.setLinearDamping(0.3f);
 		body.setAngularDamping(0.3f);
