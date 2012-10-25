@@ -21,7 +21,7 @@ class HockeyPlayer extends Sprite implements Drawable {
 	private final FixtureDef fixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	private short playerID;
 	private Vector2 startLocation;
-	private short team;
+	public short team;
 	
 	public HockeyPlayer(float pX, float pY, final TextureRegion pTextureRegion, 
 						VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld, short f_team) {
@@ -81,14 +81,16 @@ class HockeyPlayer extends Sprite implements Drawable {
 
 	@Override
 	public boolean isActive() {
-		if(NightHockeyActivity.TURN == team)
-			return isActive;
-		else
-			return false;
+		return isActive;
 	}
 
 	@Override
 	public Body getBody() {
 		return body;
 	}
+	
+	@Override
+	public short getTeam(){
+		return team;
+	}	
 }

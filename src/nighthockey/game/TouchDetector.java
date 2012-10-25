@@ -49,11 +49,12 @@ public class TouchDetector implements IOnSceneTouchListener {
 					if(distance.y < 0) distance.y *= -1;
 					
 					if(distance.y <= player.getWidthOfSpite() && distance.x <= player.getWidthOfSpite()) {
-						startTime = System.currentTimeMillis();
-	
-						player.setActive(true);
-						break;
-	
+						if(player.getTeam() == NightHockeyActivity.TURN){
+							startTime = System.currentTimeMillis();
+		
+							player.setActive(true);
+							break;
+						}
 					}
 				}
 			}

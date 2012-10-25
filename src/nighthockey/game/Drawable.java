@@ -13,4 +13,6 @@ public interface Drawable {
 	public boolean isActive();
 	
 	public short puckID = -1;
+
+	short getTeam();
 }
