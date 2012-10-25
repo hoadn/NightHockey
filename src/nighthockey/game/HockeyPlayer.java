@@ -24,11 +24,10 @@ class HockeyPlayer extends Sprite implements Drawable {
 	private short team;
 	
 	public HockeyPlayer(float pX, float pY, final TextureRegion pTextureRegion, 
-						VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld, short team) {
+						VertexBufferObjectManager pVertexBufferObjectManager, PhysicsWorld physicsWorld, short f_team) {
 		super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
 		playerID = ID++;
-		this.team = team;
-
+		this.team = f_team;
 		
 		fixtureDef.filter.categoryBits = NightHockeyActivity.CATEGORY_PLAYER;
 		fixtureDef.filter.maskBits = NightHockeyActivity.CATEGORY_ALL;
