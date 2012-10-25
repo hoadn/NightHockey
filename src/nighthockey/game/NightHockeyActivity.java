@@ -9,7 +9,8 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.scene.background.RepeatingSpriteBackground;
+import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
@@ -20,6 +21,7 @@ import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.atlas.bitmap.source.AssetBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
@@ -56,6 +58,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	private TextureRegion visitorTexture;
 	private TextureRegion puckTexture;
 	private TextureRegion spotLightTexture;
+	private SpriteBackground iceTexture;
+
 	private BitmapTextureAtlas textureAtlas;
 	
 	/* Game objects and calculators */
@@ -71,6 +75,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	public static final short VISITOR = 0x2;
 	protected static short GOAL = 0x0;
 	protected short NO_GOAL = GOAL;
+	public static short TURN = 0x0;
 	
 	/* Game collision categories */
 	public static final short CATEGORY_PUCK = 0x1;
@@ -94,6 +99,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		visitorTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "visitor.png", 64, 0);
 		puckTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "puck.png", 128, 0);
 		spotLightTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "spotlight.png", 0, 64);
+		iceTexture = new RepeatingSpriteBackground(screenWidth, screenHeight, this.getTextureManager(), AssetBitmapTextureAtlasSource.create(this.getAssets(), "gfx/ice.jpg"), this.getVertexBufferObjectManager());
 		textureAtlas.load();
 		
 		mFont = FontFactory.create(this.getFontManager(), this.getTextureManager(), 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32);
@@ -161,8 +167,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		/* Show lighting first 5 sec then start the game officially */
 		startTimer = new Timer(5f, new Timer.TimerCalculator() {
 		    public void onTick() {
-		    	scene.setBackground(new Background(1f, 1f, 1f));
-		    	
 		    	/* remove ligths and then set alpha correctly */
 		    	for(SpotLight light : spotLights)
 		    		scene.detachChild(light);
@@ -186,7 +190,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		physics = new FixedStepPhysicsWorld(25 ,new Vector2(0, 0), false, 8, 3);
 		scene = new Scene();
 		scene.registerUpdateHandler(physics);
-		scene.setBackground(new Background(0.1f, 0.1f, 0.1f));
+		scene.setBackground(iceTexture);
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
 		/* Crate game borders */
@@ -229,7 +233,10 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		
 		scene.attachChild(this.goalHome);
 		scene.attachChild(this.goalVisitor);
-
+		
+		/* Set home team to start */
+		TURN = HOME;
+		
 		return scene;
 	}
 
@@ -258,17 +265,17 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
 	
 		/* Set first team */
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 250, (screenHeight/2) - 60 , homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 250, (screenHeight/2) + 50 , homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) - 110, homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) - 10, homeTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) + 100, homeTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 250, (screenHeight/2) - 60 , homeTexture, vbo, physics, HOME));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 250, (screenHeight/2) + 50 , homeTexture, vbo, physics, HOME));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) - 110, homeTexture, vbo, physics, HOME));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) - 10, homeTexture, vbo, physics, HOME));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) - 150, (screenHeight/2) + 100, homeTexture, vbo, physics, HOME));
 		/* Set second team */
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 240, (screenHeight/2) - 60 , visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 240, (screenHeight/2) + 50 , visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) - 110, visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) - 10, visitorTexture, vbo, physics));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) + 100, visitorTexture, vbo, physics));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 240, (screenHeight/2) - 60 , visitorTexture, vbo, physics, VISITOR));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 240, (screenHeight/2) + 50 , visitorTexture, vbo, physics, VISITOR));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) - 110, visitorTexture, vbo, physics, VISITOR));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) - 10, visitorTexture, vbo, physics, VISITOR));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) + 100, visitorTexture, vbo, physics,VISITOR));
 
 		puck = new Puck(screenWidth/2, screenHeight/2, puckTexture, vbo, physics);
 		for(int i = 0; i <= 2; i++) {

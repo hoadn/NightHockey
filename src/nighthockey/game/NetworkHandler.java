@@ -136,7 +136,8 @@ public class NetworkHandler {
                 
                 clientConnector.registerClientMessage(Messages.MESSAGE_ID_MVCL, Messages.MoveClient.class, new IClientMessageHandler<SocketConnection>() {
                         @Override
-                        public void onHandleMessage(final ClientConnector<SocketConnection> pClientConnector, final IClientMessage pClientMessage) throws IOException {
+                        public void onHandleMessage(final ClientConnector<SocketConnection> pClientConnector, final IClientMessage pClientMessage) throws IOException {    	
+
                         }
                 });
                 return clientConnector;
@@ -149,7 +150,8 @@ public class NetworkHandler {
 		return isConnected;
 	}
 	
-	private void initClient() {	
+
+	private void initClient() {
 		try {
 			mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(ipAddress, SERVER_PORT)), new ServerConnectorListener());
 		} catch (UnknownHostException e) {
@@ -179,13 +181,13 @@ public class NetworkHandler {
 
 		mServerConnector.registerServerMessage(Messages.MESSAGE_ID_MOVE, Messages.Move.class, new IServerMessageHandler<SocketConnection>() {
 			@Override
-			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {	
+			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {		
 			}
 		});
 		
 		mServerConnector.registerServerMessage(Messages.MESSAGE_ID_SRGL, Messages.GoalMessage.class, new IServerMessageHandler<SocketConnection>() {
 			@Override
-			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {	
+			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {		
 			}
 		});
 	}
