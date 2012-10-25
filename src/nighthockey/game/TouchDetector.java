@@ -31,6 +31,19 @@ public class TouchDetector implements IOnSceneTouchListener {
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
 		if(pSceneTouchEvent.getAction() == MotionEvent.ACTION_DOWN) {			
 			if(listenTouch) {
+				//Check if game is online if it is don't listen other player turns
+				if(online){
+					if(NightHockeyActivity.SERVER){
+						if(NightHockeyActivity.TURN != NightHockeyActivity.HOME){
+							return false;
+						}
+					}
+					else { // It's client
+						if(NightHockeyActivity.TURN != NightHockeyActivity.VISITOR)
+							return false;
+					}
+				}
+				
 				Iterator<Body> bodies = physics.getBodies();
 				downPosition = new Vector2(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 				

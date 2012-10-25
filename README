@@ -6,11 +6,8 @@ Game is turn based where player swipes players and tryies to put puck into enemy
 
 TODO:
 - Timer calculator for turns and game
-- Ice
 - Messages between client/server
 	- Turns
 - Main menu
-- Movement effects(particles)
 - Better lighting
-- Game turns
 - set Messages into namespace insteat of the class
