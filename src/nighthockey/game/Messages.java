@@ -12,8 +12,6 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
-import android.util.Log;
-
 public class Messages implements ClientMessageFlags, ServerMessageFlags {
 	public static final short MESSAGE_ID_SYNC = 0x01;
 	public static final short MESSAGE_ID_MOVE = 0x02;
@@ -57,7 +55,6 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		}
 
 		public void set(final short pID, final float pX, final float pY) {
-			Log.i("NETWORK", "set message");
 			ID = pID;
 			x = pX;
 			y = pY;
@@ -74,23 +71,24 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			x = pDataInputStream.readFloat();
 			y = pDataInputStream.readFloat();
 			
-			PhysicsWorld physics = NightHockeyActivity.getPhysics();
-			if(physics == null) return;
-			Iterator<Body> bodies = physics.getBodies();
-			
-			while(bodies.hasNext()) {
-				Body body = bodies.next();
-				Drawable player = (Drawable) body.getUserData();
-				if(player == null) continue;
+			synchronized (NightHockeyActivity.lock) {			
+				PhysicsWorld physics = NightHockeyActivity.getPhysics();
+				if(physics == null) return;
+				Iterator<Body> bodies = physics.getBodies();
 				
-				if(player.getID() == ID)
-					player.getBody().setTransform(new Vector2(x,y), player.getBody().getAngle());
+				while(bodies.hasNext()) {
+					Body body = bodies.next();
+					Drawable player = (Drawable) body.getUserData();
+					if(player == null) continue;
+					
+					if(player.getID() == ID)
+						player.getBody().setTransform(new Vector2(x,y), player.getBody().getAngle());
+				}
 			}
 		}
 
 		@Override
 		protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
-			Log.i("NETWORK", "onWriteTransmissionData");
 			pDataOutputStream.writeShort(ID);
 			pDataOutputStream.writeFloat(x);
 			pDataOutputStream.writeFloat(y);
@@ -112,7 +110,6 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 		}
 
 		public void set(final short pID, final float pX, final float pY) {
-			Log.i("NETWORK", "set message");
 			ID = pID;
 			mX = pX;
 			mY = pY;
@@ -129,25 +126,26 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			mX = pDataInputStream.readFloat();
 			mY = pDataInputStream.readFloat();
 			
-			PhysicsWorld physics = NightHockeyActivity.getPhysics();
-			Iterator<Body> bodies = physics.getBodies();
-			TouchDetector.listenTouch = true;
-			
-			while(bodies.hasNext()) {
-				Body body = bodies.next();
-				Drawable player = (Drawable) body.getUserData();
-				if(player == null) continue;
+			synchronized (NightHockeyActivity.lock) {		
+				PhysicsWorld physics = NightHockeyActivity.getPhysics();
+				Iterator<Body> bodies = physics.getBodies();
+				TouchDetector.listenTouch = true;
 				
-				if(player.getID() == ID)
-					player.getBody().setLinearVelocity(new Vector2(mX,mY));
+				while(bodies.hasNext()) {
+					Body body = bodies.next();
+					Drawable player = (Drawable) body.getUserData();
+					if(player == null) continue;
+					
+					if(player.getID() == ID)
+						player.getBody().setLinearVelocity(new Vector2(mX,mY));
+				}
+				
+				NightHockeyActivity.changeTurn();
 			}
-			
-			NightHockeyActivity.changeTurn();
 		}
 
 		@Override
 		protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
-			Log.i("NETWORK", "onWriteTransmissionData");
 			pDataOutputStream.writeShort(ID);
 			pDataOutputStream.writeFloat(this.mX);
 			pDataOutputStream.writeFloat(this.mY);
@@ -185,27 +183,26 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			mX = pDataInputStream.readFloat();
 			mY = pDataInputStream.readFloat();
 			
-			Log.i("NETWORK", "CLIENT onReadTransmissionData:" + ID + " " + mX + " " + mY);
-			
-			PhysicsWorld physics = NightHockeyActivity.getPhysics();
-			Iterator<Body> bodies = physics.getBodies();
-			TouchDetector.listenTouch = true;
-			
-			while(bodies.hasNext()) {
-				Body body = bodies.next();
-				Drawable player = (Drawable) body.getUserData();
-				if(player == null) continue;
+			synchronized (NightHockeyActivity.lock) {
+				PhysicsWorld physics = NightHockeyActivity.getPhysics();
+				Iterator<Body> bodies = physics.getBodies();
+				TouchDetector.listenTouch = true;
 				
-				if(player.getID() == ID)
-					player.getBody().setLinearVelocity(new Vector2(mX,mY));
+				while(bodies.hasNext()) {
+					Body body = bodies.next();
+					Drawable player = (Drawable) body.getUserData();
+					if(player == null) continue;
+					
+					if(player.getID() == ID)
+						player.getBody().setLinearVelocity(new Vector2(mX,mY));
+				}
+				
+				NightHockeyActivity.changeTurn();
 			}
-			
-			NightHockeyActivity.changeTurn();
 		}
 
 		@Override
 		protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
-			Log.i("NETWORK", "onWriteTransmissionData");
 			pDataOutputStream.writeShort(ID);
 			pDataOutputStream.writeFloat(this.mX);
 			pDataOutputStream.writeFloat(this.mY);

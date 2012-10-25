@@ -84,7 +84,6 @@ class Puck extends Sprite implements Drawable {
 
 	@Override
 	public short getTeam() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 }

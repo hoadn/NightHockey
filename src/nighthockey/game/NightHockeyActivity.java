@@ -36,9 +36,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class NightHockeyActivity extends SimpleBaseGameActivity  {
-	/* Environment */
+	/* Game Environment */
 	public static int screenWidth = 800;
 	public static int screenHeight = 480;
+	public static Object lock = new Object();
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
@@ -114,7 +115,24 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	@Override
 	public Scene onCreateScene() {
 		if(SERVER || ONLINE_GAME) SINGLE_GAME = false;
-		
+		Timer syncTimer = new Timer(2.0f, new Timer.TimerCalculator() {
+			
+			@Override
+			public void onTick() {
+				synchronized (lock) {
+					Iterator<Body> bodies = physics.getBodies();
+					NetworkHandler nh = NetworkHandler.getInstance();
+					while(bodies.hasNext()) {
+						Body body = bodies.next();
+						if(body == null) continue;
+							Drawable object = (Drawable) body.getUserData();
+						if(object == null) continue;
+						nh.sendSyncMessage(object.getID(), body.getPosition());
+					}
+				}
+			}
+		});
+			
 		/* check every 0.5 sec that is bodies moving or not */
 		Timer moveCheckTimer = new Timer(0.5f, new Timer.TimerCalculator() {
 		    public void onTick() {   		
@@ -127,42 +145,41 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	    			setHomeGoal();
 	    			return;
 	    		}
-
-				Iterator<Body> bodies = physics.getBodies();
-				TouchDetector.listenTouch = true;
-				
-				while(bodies.hasNext()) {
-					Body body = bodies.next();
-					Vector2 bodyVelocity = body.getLinearVelocity();
-					float velocitySquared = (float)bodyVelocity.len2();
-					Drawable object = (Drawable) body.getUserData();
-					if(object == null) continue;
+	    		
+	    		synchronized (lock) {
+					Iterator<Body> bodies = physics.getBodies();
+					TouchDetector.listenTouch = true;
 					
-					/* check if goal */
-					if(object.getID() == Drawable.puckID && (SERVER || SINGLE_GAME)) {
-						NetworkHandler nh = NetworkHandler.getInstance();
-						if(object.getXposition() < 0) {
-							setVisitorGoal();
-							
-							if(SERVER) {
-								nh.sendGoalMessage(VISITOR);
+					while(bodies.hasNext()) {
+						Body body = bodies.next();
+						Vector2 bodyVelocity = body.getLinearVelocity();
+						float velocitySquared = (float)bodyVelocity.len2();
+						Drawable object = (Drawable) body.getUserData();
+						if(object == null) continue;
+						
+						/* check if goal */
+						if(object.getID() == Drawable.puckID && (SERVER || SINGLE_GAME)) {
+							NetworkHandler nh = NetworkHandler.getInstance();
+							if(object.getXposition() < 0) {
+								setVisitorGoal();
+								
+								if(SERVER) {
+									nh.sendGoalMessage(VISITOR);
+								}
+							} else if(object.getXposition() > screenWidth) {
+								setHomeGoal();
+								
+								if(SERVER) {
+									nh.sendGoalMessage(HOME);
+								} 
 							}
-						} else if(object.getXposition() > screenWidth) {
-							setHomeGoal();
-							
-							if(SERVER) {
-								nh.sendGoalMessage(HOME);
-							} 
 						}
+										
+						if(velocitySquared >= 0.1) {
+							TouchDetector.listenTouch = false;
+						} 
 					}
-									
-					if(velocitySquared >= 0.1) {
-						TouchDetector.listenTouch = false;
-					} else if(SERVER && velocitySquared <= 0.1) { 
-						NetworkHandler nh = NetworkHandler.getInstance();
-						nh.sendSyncMessage(object.getID(), body.getPosition());
-					} 
-				}
+	    		}
 		    }
 		});
 		/* Show lighting first 5 sec then start the game officially */
@@ -186,6 +203,10 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		
 		mEngine.registerUpdateHandler(moveCheckTimer);
 		mEngine.registerUpdateHandler(startTimer);
+		
+		if(ONLINE_GAME){
+			mEngine.registerUpdateHandler(syncTimer);
+		}
 	
 		/* Init scene and physics */
 		physics = new FixedStepPhysicsWorld(25 ,new Vector2(0, 0), false, 8, 3);
