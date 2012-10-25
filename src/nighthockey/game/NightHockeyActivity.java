@@ -10,6 +10,8 @@ import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.scene.background.RepeatingSpriteBackground;
+import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
@@ -20,6 +22,7 @@ import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.atlas.bitmap.source.AssetBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
@@ -56,6 +59,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	private TextureRegion visitorTexture;
 	private TextureRegion puckTexture;
 	private TextureRegion spotLightTexture;
+	private SpriteBackground iceTexture;
+
 	private BitmapTextureAtlas textureAtlas;
 	
 	/* Game objects and calculators */
@@ -94,6 +99,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		visitorTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "visitor.png", 64, 0);
 		puckTexture 	 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "puck.png", 128, 0);
 		spotLightTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureAtlas, this, "spotlight.png", 0, 64);
+		iceTexture = new RepeatingSpriteBackground(screenWidth, screenHeight, this.getTextureManager(), AssetBitmapTextureAtlasSource.create(this.getAssets(), "gfx/ice.jpg"), this.getVertexBufferObjectManager());
 		textureAtlas.load();
 		
 		mFont = FontFactory.create(this.getFontManager(), this.getTextureManager(), 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32);
@@ -161,8 +167,6 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		/* Show lighting first 5 sec then start the game officially */
 		startTimer = new Timer(5f, new Timer.TimerCalculator() {
 		    public void onTick() {
-		    	scene.setBackground(new Background(1f, 1f, 1f));
-		    	
 		    	/* remove ligths and then set alpha correctly */
 		    	for(SpotLight light : spotLights)
 		    		scene.detachChild(light);
@@ -186,7 +190,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		physics = new FixedStepPhysicsWorld(25 ,new Vector2(0, 0), false, 8, 3);
 		scene = new Scene();
 		scene.registerUpdateHandler(physics);
-		scene.setBackground(new Background(0.1f, 0.1f, 0.1f));
+		scene.setBackground(iceTexture);
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
 		/* Crate game borders */

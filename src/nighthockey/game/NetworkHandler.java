@@ -3,9 +3,6 @@ package nighthockey.game;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import nighthockey.game.Messages.GoalMessage;
-
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -22,7 +19,6 @@ import org.andengine.extension.multiplayer.protocol.server.connector.SocketConne
 import org.andengine.extension.multiplayer.protocol.shared.SocketConnection;
 import org.andengine.extension.multiplayer.protocol.util.MessagePool;
 
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -49,7 +45,6 @@ public class NetworkHandler {
 	public void startServer() {
 		initMessagePool();
 		
-		Log.i("NETWORK", "startServer");
 		initServer();
 	}
 	
@@ -57,12 +52,11 @@ public class NetworkHandler {
 		ipAddress = add;
 		initMessagePool();
 		
-		Log.i("NETWORK", "startClient");
 		initClient();
 	}
 	
 	public void sendGoalMessage(short goalMaker) {
-		Messages.GoalMessage goal = (Messages.GoalMessage) mMessagePool.obtainMessage(Messages.MESSAGE_ID_SYNC);
+		Messages.GoalMessage goal = (Messages.GoalMessage) mMessagePool.obtainMessage(Messages.MESSAGE_ID_SRGL);
 		goal.setGoalMaker(goalMaker);
 		
 		try {
@@ -79,7 +73,6 @@ public class NetworkHandler {
 			mServerConnector.sendClientMessage(init);
 			mMessagePool.recycleMessage(init);
 		}catch (final IOException e){
-			Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
 		}
 	}
 	
@@ -95,7 +88,6 @@ public class NetworkHandler {
 	}
 	
 	public void sendActionMessage(short ID, Vector2 velocity) {
-		Log.i("NETWORK", "Send message");
 		try {
 			Messages.Move serverMove = (Messages.Move) mMessagePool.obtainMessage(Messages.MESSAGE_ID_MOVE);
 			Messages.MoveClient moveClient = (Messages.MoveClient) mMessagePool.obtainMessage(Messages.MESSAGE_ID_MVCL);
@@ -109,7 +101,6 @@ public class NetworkHandler {
 
 			mMessagePool.recycleMessage(serverMove);
 		} catch (final IOException e) {
-			Log.e("NETWORK ERROR", "EXEPTION:" + e.getMessage());
 		}
 	}
 
@@ -118,6 +109,7 @@ public class NetworkHandler {
 		mMessagePool.registerMessage(Messages.MESSAGE_ID_MOVE, Messages.Move.class);
 		mMessagePool.registerMessage(Messages.MESSAGE_ID_INIT, Messages.Init.class);
 		mMessagePool.registerMessage(Messages.MESSAGE_ID_MVCL, Messages.MoveClient.class);
+		mMessagePool.registerMessage(Messages.MESSAGE_ID_SRGL, Messages.GoalMessage.class);
 	}
 
 	@Override
@@ -126,7 +118,6 @@ public class NetworkHandler {
 			try {
 				mSocketServer.sendBroadcastServerMessage(new Messages.ConnectionCloseServer());
 			} catch (final IOException e) {
-				Log.e("NETWORK ERROR", "EXEPTION: finalize()" + e.getMessage());
 			}
 			mSocketServer.terminate();
 		}
@@ -137,7 +128,6 @@ public class NetworkHandler {
 	}
 
 	private void initServer() {
-		Log.i("NETWORK", "initServer");
 		mSocketServer = new SocketServer<SocketConnectionClientConnector>(SERVER_PORT, new ClientConnectorListener(), new ServerStateListener()) {
 			@Override
 			protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
@@ -146,9 +136,7 @@ public class NetworkHandler {
                 
                 clientConnector.registerClientMessage(Messages.MESSAGE_ID_MVCL, Messages.MoveClient.class, new IClientMessageHandler<SocketConnection>() {
                         @Override
-                        public void onHandleMessage(final ClientConnector<SocketConnection> pClientConnector, final IClientMessage pClientMessage) throws IOException {
-                            //Message was handled here
-                        	Log.i("NETWORK", "I RECEVED MESSAGE");
+                        public void onHandleMessage(final ClientConnector<SocketConnection> pClientConnector, final IClientMessage pClientMessage) throws IOException {    	
                         }
                 });
                 return clientConnector;
@@ -162,14 +150,10 @@ public class NetworkHandler {
 	}
 	
 	private void initClient() {
-		Log.i("NETWORK", "initClient");
-		
 		try {
 			mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(ipAddress, SERVER_PORT)), new ServerConnectorListener());
 		} catch (UnknownHostException e) {
-			Log.i("NETWORK ERROR", "initClient() UnknownException");
 		} catch (IOException e) {
-			Log.i("NETWORK ERROR", "initClient() IOException ");
 		}
 		
 		registerMessages();
@@ -177,7 +161,6 @@ public class NetworkHandler {
 		try {
 			mServerConnector.getConnection().start();
 		} catch (final Throwable t) {
-			Log.i("NETWORK ERROR", "initClient() " + t.getMessage());
 		}
 	}
 	
@@ -185,23 +168,24 @@ public class NetworkHandler {
 		mServerConnector.registerServerMessage(Messages.FLAG_MESSAGE_SERVER_CONNECTION_CLOSE, Messages.ConnectionCloseServer.class, new IServerMessageHandler<SocketConnection>() {
 			@Override
 			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
-				Log.i("NETWORK", "onHandleMessage: we lost connection to server");
 			}
 		});
 
 		mServerConnector.registerServerMessage(Messages.MESSAGE_ID_SYNC, Messages.Synchrate.class, new IServerMessageHandler<SocketConnection>() {
 			@Override
 			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
-				Log.i("NETWORK", "onHandleMessage: SYNC");
-				//final Messages.Synchrate sync = (Messages.Synchrate)pServerMessage;
 			}
 		});
 
 		mServerConnector.registerServerMessage(Messages.MESSAGE_ID_MOVE, Messages.Move.class, new IServerMessageHandler<SocketConnection>() {
 			@Override
-			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
-				Log.i("NETWORK", "onHandleMessage: MOVE");
-				//final Messages.Move move = (Messages.Move)pServerMessage;			
+			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {		
+			}
+		});
+		
+		mServerConnector.registerServerMessage(Messages.MESSAGE_ID_SRGL, Messages.GoalMessage.class, new IServerMessageHandler<SocketConnection>() {
+			@Override
+			public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {		
 			}
 		});
 	}
@@ -209,13 +193,11 @@ public class NetworkHandler {
 	private class ServerConnectorListener implements ISocketConnectionServerConnectorListener {
 		@Override
 		public void onStarted(ServerConnector<SocketConnection> pServerConnector) {
-			Log.i("NETWORK", "Client connected to server");	
 			isConnected = true;
 		}
 
 		@Override
 		public void onTerminated(ServerConnector<SocketConnection> pServerConnector) {
-			Log.i("NETWORK", "Server onTerminated");
 			isConnected = false;
 		}
 	}
@@ -223,30 +205,25 @@ public class NetworkHandler {
 	private class ServerStateListener implements ISocketServerListener<SocketConnectionClientConnector> {		
 		@Override
 		public void onStarted(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
-			Log.i("NETWORK", "Server onStarted 1");
 		}
 
 		@Override
 		public void onTerminated(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
-			Log.i("NETWORK", "Server onTerminated");
 		}
 
 		@Override
 		public void onException(final SocketServer<SocketConnectionClientConnector> pSocketServer, final Throwable pThrowable) {
-			Log.i("NETWORK", "EXEPTION: " + pThrowable.getMessage());
 		}
 	}
 
 	private class ClientConnectorListener implements ISocketConnectionClientConnectorListener {
 		@Override
 		public void onStarted(final ClientConnector<SocketConnection> pConnector) {
-			Log.i("NETWORK", "Server receive connection from client");
 			isConnected = true;
 		}
 
 		@Override
 		public void onTerminated(final ClientConnector<SocketConnection> pConnector) {
-			Log.i("NETWORK", "Client Terminated");
 			isConnected = false;
 		}
 	}
