@@ -34,12 +34,12 @@ public class TouchDetector implements IOnSceneTouchListener {
 				//Check if game is online if it is don't listen other player turns
 				if(online){
 					if(NightHockeyActivity.SERVER){
-						if(NightHockeyActivity.TURN != NightHockeyActivity.HOME){
+						if(NightHockeyActivity.getTurn() != NightHockeyActivity.HOME){
 							return false;
 						}
 					}
 					else { // It's client
-						if(NightHockeyActivity.TURN != NightHockeyActivity.VISITOR)
+						if(NightHockeyActivity.getTurn() != NightHockeyActivity.VISITOR)
 							return false;
 					}
 				}
@@ -94,13 +94,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 					}
 					
 					/* Change turn */
-					if(NightHockeyActivity.TURN == NightHockeyActivity.HOME) {
-						NightHockeyActivity.TURN = NightHockeyActivity.VISITOR;
-						Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
-					} else if(NightHockeyActivity.TURN == NightHockeyActivity.VISITOR) {
-						NightHockeyActivity.TURN = NightHockeyActivity.HOME;
-						Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
-					}
+					NightHockeyActivity.changeTurn();
 					
 					listenTouch = false;
 					player.setActive(false);

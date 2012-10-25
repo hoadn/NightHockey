@@ -142,13 +142,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 					player.getBody().setLinearVelocity(new Vector2(mX,mY));
 			}
 			
-			if(NightHockeyActivity.TURN == NightHockeyActivity.HOME) {
-				NightHockeyActivity.TURN = NightHockeyActivity.VISITOR;
-				Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
-			} else if(NightHockeyActivity.TURN == NightHockeyActivity.VISITOR) {
-				NightHockeyActivity.TURN = NightHockeyActivity.HOME;
-				Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
-			}
+			NightHockeyActivity.changeTurn();
 		}
 
 		@Override
@@ -206,13 +200,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 					player.getBody().setLinearVelocity(new Vector2(mX,mY));
 			}
 			
-			if(NightHockeyActivity.TURN == NightHockeyActivity.HOME) {
-				NightHockeyActivity.TURN = NightHockeyActivity.VISITOR;
-				Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
-			} else if(NightHockeyActivity.TURN == NightHockeyActivity.VISITOR) {
-				NightHockeyActivity.TURN = NightHockeyActivity.HOME;
-				Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
-			}
+			NightHockeyActivity.changeTurn();
 		}
 
 		@Override

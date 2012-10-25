@@ -261,6 +261,20 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		
 		puck.resetPosition();
 	}
+	
+	public static void changeTurn(){	
+		if(NightHockeyActivity.TURN == NightHockeyActivity.HOME) {
+			NightHockeyActivity.TURN = NightHockeyActivity.VISITOR;
+			Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
+		} else if(NightHockeyActivity.TURN == NightHockeyActivity.VISITOR) {
+			NightHockeyActivity.TURN = NightHockeyActivity.HOME;
+			Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
+		}
+	}
+	
+	public static short getTurn(){
+		return TURN;
+	}
 
 	private void createHockeyPlayers() {
 		VertexBufferObjectManager vbo = this.getVertexBufferObjectManager();
