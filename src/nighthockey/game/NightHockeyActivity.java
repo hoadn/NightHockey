@@ -28,7 +28,6 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.HorizontalAlign;
 
 import android.graphics.Typeface;
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -39,7 +38,8 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	/* Game Environment */
 	public static int screenWidth = 800;
 	public static int screenHeight = 480;
-	public static Object lock = new Object();
+	public static Object physicsLock = new Object();
+	public static Object turnLock = new Object();
 	
 	/* Worlds(draw, physics) */
 	private Scene scene;
@@ -119,7 +119,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 			
 			@Override
 			public void onTick() {
-				synchronized (lock) {
+				synchronized (physicsLock) {
 					Iterator<Body> bodies = physics.getBodies();
 					NetworkHandler nh = NetworkHandler.getInstance();
 					while(bodies.hasNext()) {
@@ -146,7 +146,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	    			return;
 	    		}
 	    		
-	    		synchronized (lock) {
+	    		synchronized (physicsLock) {
 					Iterator<Body> bodies = physics.getBodies();
 					TouchDetector.listenTouch = true;
 					
@@ -204,7 +204,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		mEngine.registerUpdateHandler(moveCheckTimer);
 		mEngine.registerUpdateHandler(startTimer);
 		
-		if(ONLINE_GAME){
+		if(ONLINE_GAME && SERVER){
 			mEngine.registerUpdateHandler(syncTimer);
 		}
 	
@@ -283,13 +283,13 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		puck.resetPosition();
 	}
 	
-	public static void changeTurn(){	
-		if(NightHockeyActivity.TURN == NightHockeyActivity.HOME) {
-			NightHockeyActivity.TURN = NightHockeyActivity.VISITOR;
-			Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
-		} else if(NightHockeyActivity.TURN == NightHockeyActivity.VISITOR) {
-			NightHockeyActivity.TURN = NightHockeyActivity.HOME;
-			Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
+	public static void changeTurn(){
+		synchronized (turnLock) {
+			if(NightHockeyActivity.TURN == NightHockeyActivity.HOME) {
+				NightHockeyActivity.TURN = NightHockeyActivity.VISITOR;
+			} else if(NightHockeyActivity.TURN == NightHockeyActivity.VISITOR) {
+				NightHockeyActivity.TURN = NightHockeyActivity.HOME;
+			}
 		}
 	}
 	

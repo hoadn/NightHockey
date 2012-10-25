@@ -71,7 +71,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			x = pDataInputStream.readFloat();
 			y = pDataInputStream.readFloat();
 			
-			synchronized (NightHockeyActivity.lock) {			
+			synchronized (NightHockeyActivity.physicsLock) {			
 				PhysicsWorld physics = NightHockeyActivity.getPhysics();
 				if(physics == null) return;
 				Iterator<Body> bodies = physics.getBodies();
@@ -126,7 +126,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			mX = pDataInputStream.readFloat();
 			mY = pDataInputStream.readFloat();
 			
-			synchronized (NightHockeyActivity.lock) {		
+			synchronized (NightHockeyActivity.physicsLock) {		
 				PhysicsWorld physics = NightHockeyActivity.getPhysics();
 				Iterator<Body> bodies = physics.getBodies();
 				TouchDetector.listenTouch = true;
@@ -183,7 +183,7 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 			mX = pDataInputStream.readFloat();
 			mY = pDataInputStream.readFloat();
 			
-			synchronized (NightHockeyActivity.lock) {
+			synchronized (NightHockeyActivity.physicsLock) {
 				PhysicsWorld physics = NightHockeyActivity.getPhysics();
 				Iterator<Body> bodies = physics.getBodies();
 				TouchDetector.listenTouch = true;

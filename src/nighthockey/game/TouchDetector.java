@@ -38,7 +38,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 					}
 				}
 				
-				synchronized (NightHockeyActivity.lock) {
+				synchronized (NightHockeyActivity.physicsLock) {
 					Iterator<Body> bodies = NightHockeyActivity.getPhysics().getBodies();
 					downPosition = new Vector2(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 					
@@ -68,7 +68,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 				}
 			}
 		} else if(pSceneTouchEvent.getAction() == MotionEvent.ACTION_UP) {		
-			synchronized (NightHockeyActivity.lock) {
+			synchronized (NightHockeyActivity.physicsLock) {
 				Vector2 upPosition = new Vector2(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 				Iterator<Body> bodies = NightHockeyActivity.getPhysics().getBodies();
 				
