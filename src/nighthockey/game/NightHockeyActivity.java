@@ -28,6 +28,7 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.HorizontalAlign;
 
 import android.graphics.Typeface;
+import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -75,7 +76,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	public static final short VISITOR = 0x2;
 	protected static short GOAL = 0x0;
 	protected short NO_GOAL = GOAL;
-	public static short TURN = 0x0;
+	public static short TURN;
 	
 	/* Game collision categories */
 	public static final short CATEGORY_PUCK = 0x1;
@@ -107,7 +108,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 	}
 	
 	public static void goalHasBeenMade(short goalMaker) {
-		GOAL = goalMaker;
+		GOAL = goalMaker; 
 	}
 
 	@Override
@@ -156,7 +157,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 					}
 									
 					if(velocitySquared >= 0.1) {
-						TouchDetector.listenTouch = false;			
+						TouchDetector.listenTouch = false;
 					} else if(SERVER && velocitySquared <= 0.1) { 
 						NetworkHandler nh = NetworkHandler.getInstance();
 						nh.sendSyncMessage(object.getID(), body.getPosition());
@@ -275,7 +276,7 @@ public class NightHockeyActivity extends SimpleBaseGameActivity  {
 		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 240, (screenHeight/2) + 50 , visitorTexture, vbo, physics, VISITOR));
 		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) - 110, visitorTexture, vbo, physics, VISITOR));
 		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) - 10, visitorTexture, vbo, physics, VISITOR));
-		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) + 100, visitorTexture, vbo, physics,VISITOR));
+		hockeyPlayers.add(new HockeyPlayer((screenWidth/2) + 140, (screenHeight/2) + 100, visitorTexture, vbo, physics, VISITOR));
 
 		puck = new Puck(screenWidth/2, screenHeight/2, puckTexture, vbo, physics);
 		for(int i = 0; i <= 2; i++) {

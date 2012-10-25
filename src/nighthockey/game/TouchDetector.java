@@ -7,6 +7,8 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.input.touch.TouchEvent;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class TouchDetector implements IOnSceneTouchListener {
@@ -33,7 +35,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 					Body body = bodies.next();
 					Drawable player = (Drawable) body.getUserData();
 					if(player == null) continue;
-					if(player.getID() == -1) continue; // TODO move -1 into namespace
+					if(player.getID() == Drawable.puckID) continue;
 	
 					Vector2 distance = new Vector2((player.getXposition() + player.getWidthOfSpite()/2) - downPosition.x,
 							(player.getYposition() + player.getHeightOfSprite()/2) - downPosition.y);
@@ -50,7 +52,7 @@ public class TouchDetector implements IOnSceneTouchListener {
 					}
 				}
 			}
-		} else if(pSceneTouchEvent.getAction() == MotionEvent.ACTION_UP) {
+		} else if(pSceneTouchEvent.getAction() == MotionEvent.ACTION_UP) {			
 			Vector2 upPosition = new Vector2(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 			Iterator<Body> bodies = physics.getBodies();
 			
@@ -72,8 +74,18 @@ public class TouchDetector implements IOnSceneTouchListener {
 						handler.sendActionMessage(player.getID(), speed);
 					}
 					
+					/* Change turn */
+					if(NightHockeyActivity.TURN == NightHockeyActivity.HOME) {
+						NightHockeyActivity.TURN = NightHockeyActivity.VISITOR;
+						Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
+					} else if(NightHockeyActivity.TURN == NightHockeyActivity.VISITOR) {
+						NightHockeyActivity.TURN = NightHockeyActivity.HOME;
+						Log.i("TURN", "TURN IS " + NightHockeyActivity.TURN);
+					}
+					
 					listenTouch = false;
 					player.setActive(false);
+					
 					break;
 				}
 			}
