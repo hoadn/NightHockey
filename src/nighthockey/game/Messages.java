@@ -98,9 +98,9 @@ public class Messages implements ClientMessageFlags, ServerMessageFlags {
 	}
 
 	public static class Move extends ServerMessage {
-		public short ID;
-		public float mX;
-		public float mY;
+		private short ID;
+		private float mX;
+		private float mY;
 		
 		public Move() {
 		}
